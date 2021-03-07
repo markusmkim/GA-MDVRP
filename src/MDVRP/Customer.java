@@ -1,6 +1,8 @@
 package MDVRP;
 
 
+import java.util.Arrays;
+
 public class Customer {
     private int id;
     private int x;
@@ -33,5 +35,11 @@ public class Customer {
     public int getDemand()      { return demand; }
     public Depot getDepot()     { return depot; }
     public boolean getOnBorder(){ return onBorderline; }
+
+    @Override
+    public String toString() {
+        // return customer id
+        return "" + this.id;
+    }
 
 }
