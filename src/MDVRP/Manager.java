@@ -130,7 +130,6 @@ public class Manager {
 
             // check if customer is on borderline between nearest and second nearest depot, with margin = threshold
             if (Math.abs(shortestDistance - shortestOtherDistance) < this.borderlineThreshold) {
-                System.out.println(currentShortestDepot);
                 isBorderlineCustomer = true;
             }
 

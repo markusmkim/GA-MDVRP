@@ -1,5 +1,7 @@
-import MDVRP.Customer;
-import Utils.Euclidian;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class Test {
     /*
@@ -7,19 +9,13 @@ public class Test {
      */
 
     public static void main(String []args) {
-        System.out.println("Customer test:"); // prints Hello World
-
-        Customer c = new Customer(0, 1, 2, 3,4);
-        System.out.println(c.getId());
-        System.out.println(c.getX());
-        System.out.println(c.getY());
-        System.out.println(c.getDuration());
-        System.out.println(c.getDemand());
-
-        int[] co1 = new int[]{1, 1};
-        int[] co2 = new int[]{4, -4};
-
-        double dist = Euclidian.distance(co1, co2);
-        System.out.println("\n" + dist);
+        List<Integer> ints = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ints.add(i + 1);
+        }
+        List<Integer> ints2 = new ArrayList<>(ints);
+        Collections.shuffle(ints);
+        System.out.println(Arrays.toString(ints2.toArray()));
+        System.out.println(Arrays.toString(ints.toArray()));
     }
 }

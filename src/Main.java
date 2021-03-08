@@ -1,3 +1,5 @@
+import GA.Components.Population.Individual;
+import GA.Components.Population.Initializer;
 import MDVRP.Customer;
 import MDVRP.Manager;
 import javafx.application.Application;
@@ -55,10 +57,19 @@ public class Main extends Application {
             System.out.println(depot.getCustomerIds());
         }
 
+        ////-- Test GA initializer
+        System.out.println("\nInitial population:");
+        List<Individual> population = Initializer.init(10, depots);
+        for (Individual individual: population) {
+            System.out.println(individual);
+        }
+        ////--
 
+        ////*** Next: Write RouteScheduler to create route from one individual. And display in graphics window
+        ////***
 
         // Create the Canvas
-        Canvas canvas = new Canvas(400, 400);
+        Canvas canvas = new Canvas(420, 420);
         //// Set the width/height of the Canvas canvas: canvas.setWidth(400) - canvas.setHeight(400);
 
         // Get the graphics context of the canvas
@@ -99,7 +110,7 @@ public class Main extends Application {
             for (Customer customer: depot.getCustomers()) {
                 int size = 6;
                 if (customer.getOnBorder()) {
-                    size = 10;
+                    size = 9;
                 }
                 gc.setFill(colors[colorIndex]);
                 int xx = customer.getX() * 5;  // scale up everything by a factor = 4
