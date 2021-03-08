@@ -28,6 +28,7 @@ public class Main extends Application {
 
         List<Customer> customers = m.getCustomers();
         List<Depot> depots = m.getDepots();
+
         int numCustomers = customers.size();
         int numDepots = depots.size();
         System.out.println("Number of customer: " + numCustomers);

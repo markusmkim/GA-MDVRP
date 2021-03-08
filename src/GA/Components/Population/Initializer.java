@@ -2,10 +2,9 @@ package GA.Components.Population;
 
 import MDVRP.Customer;
 import MDVRP.Depot;
+import MDVRP.RouteScheduler;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 public class Initializer {
@@ -14,16 +13,13 @@ public class Initializer {
         List<Individual> population = new ArrayList<>();
 
         for (int i = 0; i < populationSize; i++) {
-            List<List<Integer>> chromosome = new ArrayList<>();
+            Map<Integer, List<List<Integer>>> chromosome = new HashMap<>();
+
             for (Depot depot: depots) {
-                List<Integer> chromosomeDepot = new ArrayList<>();
-                List<Customer> customers = new ArrayList<>(depot.getCustomers());   // make COPY of customers
-                Collections.shuffle(customers);                                     // then shuffle copied list
-                for (Customer customer: customers) {
-                    chromosomeDepot.add(customer.getId());
-                }
-                chromosome.add(chromosomeDepot);
+                List<List<Integer>> chromosomeDepot = RouteScheduler.getInitialRoutes(depot);
+                chromosome.put(depot.getId(), chromosomeDepot);
             }
+
             Individual individual = new Individual(chromosome);
             population.add(individual);
         }

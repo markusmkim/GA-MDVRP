@@ -11,7 +11,7 @@ public class Depot {
     private int y;
     private int maxVehicles;
     private int maxDuration;
-    private int maxVehicleLoad;
+    private int maxVehicleLoad;  // Capacity
     private List<Customer> customers = new ArrayList<>();
 
 
@@ -41,6 +41,7 @@ public class Depot {
     public int getX()                       { return this.x; }
     public int getY()                       { return this.y; }
     public int getMaxDuration()             { return maxDuration; }
+    public int getMaxVehicles()             { return this.maxVehicles; }
     public int getMaxVehicleLoad()          { return maxVehicleLoad; }
     public List<Customer> getCustomers()    { return this.customers; }
 
