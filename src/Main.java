@@ -66,7 +66,7 @@ public class Main extends Application {
         }
         ////--
 
-        ////*** Next: Write RouteScheduler to create route from one individual. And display in graphics window
+        ////*** Next: Display in graphics window
         ////***
 
         // Create the Canvas
@@ -76,7 +76,7 @@ public class Main extends Application {
         // Get the graphics context of the canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        this.drawCustomers(gc, depots);
+        this.drawCustomers(gc, depots, population.get(0));
 
 
         // Create the Pane
@@ -93,7 +93,7 @@ public class Main extends Application {
         stage.show();
     }
 
-    private void drawCustomers(GraphicsContext gc, List<Depot> depots) {
+    private void drawCustomers(GraphicsContext gc, List<Depot> depots, Individual individual) {
         System.out.println(depots);
 
         Color[] colors = new Color[]{Color.CADETBLUE, Color.CORAL, Color.CORNFLOWERBLUE,
@@ -103,24 +103,46 @@ public class Main extends Application {
         for (Depot depot: depots) {
             // draw depot
             gc.setFill(Color.BLACK);
-            int x = depot.getX() * 5;  // scale up everything by a factor = 4
-            int y = depot.getY() * 5;
-            gc.fillRect(x, y, 6, 6);
+            int depotSize = 10;
+            int x = (depot.getX() * 5) - (depotSize / 2);  // scale up everything by a factor = 5
+            int y = (depot.getY() * 5) - (depotSize / 2);
+            gc.fillRect(x, y, depotSize, depotSize);
 
             // draw all customers belonging to depots
+            gc.setFill(colors[colorIndex]);
             for (Customer customer: depot.getCustomers()) {
                 int size = 6;
                 if (customer.getOnBorder()) {
-                    size = 9;
+                    size = 10;
                 }
-                gc.setFill(colors[colorIndex]);
-                int xx = customer.getX() * 5;  // scale up everything by a factor = 4
-                int yy = customer.getY() * 5;
+                int xx = (customer.getX() * 5) - (size / 2);  // scale up everything by a factor = 5
+                int yy = (customer.getY() * 5) - (size / 2);
                 gc.fillOval(xx, yy, size, size);
             }
+            gc.setStroke(colors[colorIndex]);
+            this.drawRoutes(gc, depot, individual);
             colorIndex++;
         }
+    }
 
+    private void drawRoutes(GraphicsContext gc, Depot depot, Individual individual) {
+        List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
+
+        for (List<Integer> route : routes) {
+            double[] xPoints = new double[route.size() + 1];
+            double[] yPoints = new double[route.size() + 1];
+
+            xPoints[0] = depot.getX() * 5;
+            yPoints[0] = depot.getY() * 5;
+
+            for (int i = 0; i < route.size(); i++) {
+                Customer customer = depot.getCustomer(route.get(i));
+                xPoints[i + 1] = customer.getX() * 5;
+                yPoints[i + 1] = customer.getY() * 5;
+            }
+
+            gc.strokePolygon(xPoints, yPoints, xPoints.length);
+        }
     }
 
 

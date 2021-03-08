@@ -45,6 +45,10 @@ public class Depot {
     public int getMaxVehicleLoad()          { return maxVehicleLoad; }
     public List<Customer> getCustomers()    { return this.customers; }
 
+    public Customer getCustomer(int id) {
+        return this.customers.stream().filter(c -> id == c.getId()).findAny().orElse(null);
+    }
+
     public String getCustomerIds() {
         String customerIds = Arrays.toString(this.customers.toArray());
         return "Depot " + this.getId() + " has customers: " + customerIds;
