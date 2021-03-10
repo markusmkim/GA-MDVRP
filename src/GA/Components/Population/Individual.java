@@ -6,12 +6,24 @@ import java.util.Map;
 
 
 public class Individual {
+    private double fitness;
+
     // length = number of depots
     private Map<Integer, List<List<Integer>>> chromosome;
 
 
     public Individual(Map<Integer, List<List<Integer>>> initialChromosome) {
         this.chromosome = initialChromosome;
+    }
+
+
+    public double getFitness() { return fitness; }
+    public void setFitness(double fitness) {
+        if (fitness < 0) {
+            System.out.println("Something wrong - negative fitness in Individual.setFitness");
+            return;
+        }
+        this.fitness = fitness;
     }
 
 

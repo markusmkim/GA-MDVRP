@@ -17,6 +17,7 @@ public class RouteScheduler {
             maxDuration = 1000000000;
         }
         int maxVehicleLoad = depot.getMaxVehicleLoad();
+        //////System.out.println("Max vehicle load: " + maxVehicleLoad);
         int maxVehicles = depot.getMaxVehicles();
 
         List<List<Integer>> routes = new ArrayList<>();
@@ -31,6 +32,8 @@ public class RouteScheduler {
             boolean durationConstraintHolds = currentRouteDuration + customer.getDuration() <= maxDuration;
             if (demandConstraintHolds && durationConstraintHolds) {
                 route.add(customer.getId());
+                currentAggregatedVehicleLoad += customer.getDemand();
+                currentRouteDuration += customer.getDuration();
             }
             else {
                 routes.add(route);          // Add current route to router
@@ -38,10 +41,15 @@ public class RouteScheduler {
                 route.add(customer.getId());
                 currentRouteDuration = customer.getDuration();
                 currentAggregatedVehicleLoad = customer.getDemand();
+                numberOfVehiclesInUse += 1;
             }
         }
         if (route.size() > 0) {  // Add last route
             routes.add(route);
+            numberOfVehiclesInUse += 1;
+        }
+        if (numberOfVehiclesInUse > maxVehicles) {
+            System.out.println("\n -------------------------\n >> Too many vehicles! <<\n -------------------------\n" );
         }
         return routes;
     }

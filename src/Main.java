@@ -1,3 +1,4 @@
+import GA.Components.Population.Metrics;
 import GA.Components.Population.Individual;
 import GA.Components.Population.Initializer;
 import MDVRP.Customer;
@@ -76,7 +77,10 @@ public class Main extends Application {
         // Get the graphics context of the canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        this.drawCustomers(gc, depots, population.get(0));
+        Individual chosenSolution = population.get(0);
+        double solutionCost = Metrics.getTotalDistance(depots, chosenSolution);  // total distance travelled in solution
+        System.out.println("\nTotal distance: " + solutionCost);
+        this.drawCustomers(gc, depots, chosenSolution);
 
 
         // Create the Pane
