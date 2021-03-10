@@ -25,9 +25,8 @@ public class Depot {
     }
 
 
-    public void addCustomer(Customer customer, boolean onBorderline) {
+    public void addCustomer(Customer customer) {
         this.customers.add(customer);
-        customer.setDepot(this, onBorderline);
     }
 
     public void removeCustomer(Customer customer) {

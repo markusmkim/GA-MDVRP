@@ -1,7 +1,5 @@
 package MDVRP;
 
-import GA.Components.Population.Individual;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

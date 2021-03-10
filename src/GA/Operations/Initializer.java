@@ -1,6 +1,6 @@
-package GA.Components.Population;
+package GA.Operations;
 
-import MDVRP.Customer;
+import GA.Components.Individual;
 import MDVRP.Depot;
 import MDVRP.RouteScheduler;
 

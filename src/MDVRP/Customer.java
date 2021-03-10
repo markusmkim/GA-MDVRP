@@ -9,7 +9,6 @@ public class Customer {
     private int y;
     private int duration;
     private int demand;
-    private Depot depot;
     private boolean onBorderline;
 
 
@@ -21,19 +20,15 @@ public class Customer {
         this.demand = demand;
     }
 
-
-    public void setDepot(Depot depot, boolean onBorderline) {
-        this.depot = depot;
-        this.onBorderline = onBorderline;
+    public void setOnBorderline() {
+        this.onBorderline = true;
     }
-
 
     public int getId()          { return id; }
     public int getX()           { return x; }
     public int getY()           { return y; }
     public int getDuration()    { return duration; }
     public int getDemand()      { return demand; }
-    public Depot getDepot()     { return depot; }
     public boolean getOnBorder(){ return onBorderline; }
 
     @Override

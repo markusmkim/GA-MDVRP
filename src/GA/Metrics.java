@@ -1,10 +1,10 @@
-package GA.Components.Population;
+package GA;
 
+import GA.Components.Individual;
 import MDVRP.Customer;
 import MDVRP.Depot;
 import Utils.Euclidian;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class Metrics {
             return 0;
         }
 
-        System.out.println("\n Calculation new route \n -------------------------------------------------------------");
+        System.out.println("\nCalculation new route \n----------------------------------");
         int totalDistance = 0;
 
         int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
@@ -59,7 +59,7 @@ public class Metrics {
         Customer toCustomer = depot.getCustomer(route.get(0));
         int[] toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
         totalDistance += Euclidian.distance(depotCoordinates, toCustomerCoordinates);
-        System.out.println("Adding distance from " + Arrays.toString(depotCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
+        //// System.out.println("Adding distance from " + Arrays.toString(depotCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
 
 
         // Add distances between customers
@@ -71,14 +71,14 @@ public class Metrics {
             toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
 
             totalDistance += Euclidian.distance(fromCustomerCoordinates, toCustomerCoordinates);
-            System.out.println("Adding distance from " + Arrays.toString(fromCustomerCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
+            //// System.out.println("Adding distance from " + Arrays.toString(fromCustomerCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
 
             fromCustomer = toCustomer;
         }
 
         // Add distance from last customer and back to depot
         totalDistance += Euclidian.distance(toCustomerCoordinates, depotCoordinates);
-        System.out.println("Adding distance from " + Arrays.toString(toCustomerCoordinates) + " to " + Arrays.toString(depotCoordinates));
+        //// System.out.println("Adding distance from " + Arrays.toString(toCustomerCoordinates) + " to " + Arrays.toString(depotCoordinates));
         System.out.println("=");
         System.out.println("Route distance: " + totalDistance);
         return totalDistance;

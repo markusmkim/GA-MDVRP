@@ -1,8 +1,8 @@
-import GA.Components.Population.Metrics;
-import GA.Components.Population.Individual;
-import GA.Components.Population.Initializer;
+import GA.Algorithm;
+import GA.Components.Individual;
 import MDVRP.Customer;
 import MDVRP.Manager;
+import MDVRP.Solution;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -11,8 +11,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import MDVRP.Depot;
@@ -24,78 +22,31 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Manager m = new Manager("data/problems/p01", 5);
-        m.assignCustomersToDepots();
+        Manager manager = new Manager("data/problems/p01", 5);
 
-        List<Customer> customers = m.getCustomers();
-        List<Depot> depots = m.getDepots();
+        Algorithm ga = new Algorithm(manager);
 
-        int numCustomers = customers.size();
-        int numDepots = depots.size();
-        System.out.println("Number of customer: " + numCustomers);
-        System.out.println("Number of depots:   " + numDepots);
-        Customer customer10 = customers.get(9);
-        System.out.println("\nCustomer example: Customer 10");
-        System.out.println("------------------------");
-        System.out.println("Id:                 " + customer10.getId());
-        System.out.println("X coordinate:       " + customer10.getX());
-        System.out.println("Y coordinate:       " + customer10.getY());
-        System.out.println("Duration:           " + customer10.getDuration());
-        System.out.println("Demand:             " + customer10.getDemand());
-        System.out.println("Depot:              " + customer10.getDepot());
+        // Run genetic algorithm and get best solution found
+        Solution solution = ga.run();
 
-        List<Integer> borderLineCustomerIds = new ArrayList<>();
-        for (Customer customer: customers) {
-            if (customer.getOnBorder()) {
-                borderLineCustomerIds.add(customer.getId());
-            }
-        }
-        String borderLineCustomerIdsString = Arrays.toString(borderLineCustomerIds.toArray());
-        System.out.println("\nCustomers on borderline:");
-        System.out.println(borderLineCustomerIdsString);
-
-        System.out.println("------------------------");
-        for (Depot depot: depots) {
-            System.out.println(depot.getCustomerIds());
-        }
-
-        ////-- Test GA initializer
-        System.out.println("\nInitial population:");
-        List<Individual> population = Initializer.init(10, depots);
-        for (Individual individual: population) {
-            System.out.println(individual);
-        }
-        ////--
-
-        ////*** Next: Display in graphics window
-        ////***
-
-        // Create the Canvas
-        Canvas canvas = new Canvas(420, 420);
-        //// Set the width/height of the Canvas canvas: canvas.setWidth(400) - canvas.setHeight(400);
-
-        // Get the graphics context of the canvas
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        Individual chosenSolution = population.get(0);
-        double solutionCost = Metrics.getTotalDistance(depots, chosenSolution);  // total distance travelled in solution
-        System.out.println("\nTotal distance: " + solutionCost);
-        this.drawCustomers(gc, depots, chosenSolution);
+        List<Depot> depots = solution.getDepots();
+        double solutionCost = solution.getIndividual().getFitness();
+        System.out.println("\nTotal distance best solution: " + solutionCost);
 
 
-        // Create the Pane
-        Pane root = new Pane();
-        // Add the Canvas to the Pane
-        root.getChildren().add(canvas);
-        // Create the Scene
-        Scene scene = new Scene(root);
-        // Add the Scene to the Stage
-        stage.setScene(scene);
-        // Set the Title of the Stage
-        stage.setTitle("Solution");
-        // Display the Stage
-        stage.show();
+        Canvas canvas = new Canvas(420, 420);                 // Create the Canvas
+        GraphicsContext gc = canvas.getGraphicsContext2D();                 // Get the graphics context of the canvas
+
+        this.drawCustomers(gc, depots, solution.getIndividual());           // Draw solution
+
+        Pane root = new Pane();                                             // Create the Pane
+        root.getChildren().add(canvas);                                     // Add the Canvas to the Pane
+        Scene scene = new Scene(root);                                      // Create the Scene
+        stage.setScene(scene);                                              // Add the Scene to the Stage
+        stage.setTitle("Solution");                                         // Set the Title of the Stage
+        stage.show();                                                       // Display the Stage
     }
+
 
     private void drawCustomers(GraphicsContext gc, List<Depot> depots, Individual individual) {
         System.out.println(depots);
@@ -128,6 +79,7 @@ public class Main extends Application {
             colorIndex++;
         }
     }
+
 
     private void drawRoutes(GraphicsContext gc, Depot depot, Individual individual) {
         List<List<Integer>> routes = individual.getChromosome().get(depot.getId());

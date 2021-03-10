@@ -2,12 +2,10 @@ package MDVRP;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.List;
+import java.util.*;
 import java.lang.Math;
 
+import GA.Components.Individual;
 import Utils.Euclidian;
 
 
@@ -25,7 +23,27 @@ public class Manager {
 
 
     public List<Customer> getCustomers() { return this.customers; }
-    public List<Depot> getDepots()       { return this.depots; }
+    private Customer getCustomer(int id) {
+        return this.customers.stream().filter(c -> id == c.getId()).findAny().orElse(null);
+    }
+
+
+
+    private List<Depot> copyDepots() {
+        // Create copy of depots
+        List<Depot> depots = new ArrayList<>();
+        for (Depot depot: this.depots) {
+            int id = depot.getId();
+            int x = depot.getX();
+            int y = depot.getY();
+            int maxVehicles = depot.getMaxVehicles();
+            int maxDuration = depot.getMaxDuration();
+            int maxVehicleLoad = depot.getMaxVehicleLoad();
+            Depot depotCopy = new Depot(id, x, y, maxVehicles, maxDuration, maxVehicleLoad);
+            depots.add(depotCopy);
+        }
+        return depots;
+    }
 
 
     private void readData(String problemFilepath) {
@@ -100,20 +118,22 @@ public class Manager {
     }
 
 
-    public void assignCustomersToDepots() {
+    public List<Depot> assignCustomersToDepots() {
+        List<Depot> depots = this.copyDepots();
+
         for (Customer customer: this.customers) {
             boolean isBorderlineCustomer = false;
             int[] customerCoordinates = new int[]{customer.getX(), customer.getY()};
 
             // initial values
-            Depot firstDepot = this.depots.get(0);
+            Depot firstDepot = depots.get(0);
             double shortestDistance = 1000000000;
             Depot currentShortestDepot = firstDepot;
             double shortestOtherDistance = 1000000000;
 
             // loop through depots to find the nearest depot and the distance to that depot,
             // and also the distance to second nearest depot (to check if on borderline)
-            for (Depot depot: this.depots) {
+            for (Depot depot: depots) {
                 int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
                 double distance = Euclidian.distance(customerCoordinates, depotCoordinates);
                 if (distance < shortestDistance) {
@@ -134,8 +154,27 @@ public class Manager {
             }
 
             // add customer to the depot closest to the customer
-            currentShortestDepot.addCustomer(customer, isBorderlineCustomer);
+            currentShortestDepot.addCustomer(customer);
+            if (isBorderlineCustomer) {
+                customer.setOnBorderline();
+            }
         }
+        return depots;
     }
 
+
+    public List<Depot> assignCustomerToDepotsFromIndividual(Individual individual) {
+        List<Depot> depots = this.copyDepots();
+        for (Depot depot : depots) {
+            List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
+            for (List<Integer> route : routes) {
+                for (Integer customerId : route) {
+                    Customer customer = this.getCustomer(customerId);
+                    depot.addCustomer(customer);
+                }
+            }
+        }
+
+        return depots;
+    }
 }
