@@ -1,8 +1,6 @@
 import GA.Algorithm;
 import GA.Components.Individual;
-import MDVRP.Customer;
-import MDVRP.Manager;
-import MDVRP.Solution;
+import MDVRP.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -12,8 +10,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.List;
-
-import MDVRP.Depot;
 
 // Take a look at https://zetcode.com/gui/javafx/canvas/
 
@@ -29,7 +25,7 @@ public class Main extends Application {
         // Run genetic algorithm and get best solution found
         Solution solution = ga.run();
 
-        List<Depot> depots = solution.getDepots();
+        List<CrowdedDepot> depots = solution.getDepots();
         double solutionCost = solution.getIndividual().getFitness();
         System.out.println("\nTotal distance best solution: " + solutionCost);
 
@@ -48,14 +44,14 @@ public class Main extends Application {
     }
 
 
-    private void drawCustomers(GraphicsContext gc, List<Depot> depots, Individual individual) {
+    private void drawCustomers(GraphicsContext gc, List<CrowdedDepot> depots, Individual individual) {
         System.out.println(depots);
 
         Color[] colors = new Color[]{Color.CADETBLUE, Color.CORAL, Color.CORNFLOWERBLUE,
                 Color.DARKGOLDENROD, Color.DARKMAGENTA, Color.DARKSALMON};
         int colorIndex = 0;
 
-        for (Depot depot: depots) {
+        for (CrowdedDepot depot: depots) {
             // draw depot
             gc.setFill(Color.BLACK);
             int depotSize = 10;
@@ -81,7 +77,7 @@ public class Main extends Application {
     }
 
 
-    private void drawRoutes(GraphicsContext gc, Depot depot, Individual individual) {
+    private void drawRoutes(GraphicsContext gc, CrowdedDepot depot, Individual individual) {
         List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
 
         for (List<Integer> route : routes) {

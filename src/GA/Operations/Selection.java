@@ -10,8 +10,8 @@ public class Selection {
 
     public static Individual[] selectCompetitorPair(List<Individual> population) {
         Random random = new Random();
-        Individual p1 = population.get(random.nextInt());
-        Individual p2 = population.get(random.nextInt());
+        Individual p1 = population.get(random.nextInt(population.size()));
+        Individual p2 = population.get(random.nextInt(population.size()));
         return new Individual[]{p1, p2};
     }
 

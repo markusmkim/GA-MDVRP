@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.lang.Math;
+import java.util.stream.Collectors;
 
 import GA.Components.Individual;
+import GA.Operations.Selection;
 import Utils.Euclidian;
 
 
@@ -23,28 +25,20 @@ public class Manager {
 
 
     public List<Customer> getCustomers() { return this.customers; }
-    private Customer getCustomer(int id) {
+    public List<Depot> getDepots()       { return this.depots; }
+
+    public Customer getCustomer(int id) {
         return this.customers.stream().filter(c -> id == c.getId()).findAny().orElse(null);
     }
 
-
+    public Depot getDepot(int id) {
+        return this.depots.stream().filter(d -> id == d.getId()).findAny().orElse(null);
+    }
 
     private List<Depot> copyDepots() {
         // Create copy of depots
-        List<Depot> depots = new ArrayList<>();
-        for (Depot depot: this.depots) {
-            int id = depot.getId();
-            int x = depot.getX();
-            int y = depot.getY();
-            int maxVehicles = depot.getMaxVehicles();
-            int maxDuration = depot.getMaxDuration();
-            int maxVehicleLoad = depot.getMaxVehicleLoad();
-            Depot depotCopy = new Depot(id, x, y, maxVehicles, maxDuration, maxVehicleLoad);
-            depots.add(depotCopy);
-        }
-        return depots;
+        return this.depots.stream().map(Depot::getDepotCopy).collect(Collectors.toList());
     }
-
 
     private void readData(String problemFilepath) {
         try {
@@ -118,22 +112,22 @@ public class Manager {
     }
 
 
-    public List<Depot> assignCustomersToDepots() {
-        List<Depot> depots = this.copyDepots();
+    public List<CrowdedDepot> assignCustomersToDepots() {
+        List<CrowdedDepot> depots = this.copyDepots().stream().map(CrowdedDepot::new).collect(Collectors.toList());
 
         for (Customer customer: this.customers) {
             boolean isBorderlineCustomer = false;
             int[] customerCoordinates = new int[]{customer.getX(), customer.getY()};
 
             // initial values
-            Depot firstDepot = depots.get(0);
+            CrowdedDepot firstDepot = depots.get(0);
             double shortestDistance = 1000000000;
-            Depot currentShortestDepot = firstDepot;
+            CrowdedDepot currentShortestDepot = firstDepot;
             double shortestOtherDistance = 1000000000;
 
             // loop through depots to find the nearest depot and the distance to that depot,
             // and also the distance to second nearest depot (to check if on borderline)
-            for (Depot depot: depots) {
+            for (CrowdedDepot depot: depots) {
                 int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
                 double distance = Euclidian.distance(customerCoordinates, depotCoordinates);
                 if (distance < shortestDistance) {
@@ -163,9 +157,9 @@ public class Manager {
     }
 
 
-    public List<Depot> assignCustomerToDepotsFromIndividual(Individual individual) {
-        List<Depot> depots = this.copyDepots();
-        for (Depot depot : depots) {
+    public List<CrowdedDepot> assignCustomerToDepotsFromIndividual(Individual individual) {
+        List<CrowdedDepot> depots = this.copyDepots().stream().map(CrowdedDepot::new).collect(Collectors.toList());
+        for (CrowdedDepot depot : depots) {
             List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
             for (List<Integer> route : routes) {
                 for (Integer customerId : route) {
@@ -177,4 +171,6 @@ public class Manager {
 
         return depots;
     }
+
+
 }

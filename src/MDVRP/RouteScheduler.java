@@ -6,7 +6,7 @@ import java.util.List;
 
 public class RouteScheduler {
 
-    public static List<List<Integer>> getInitialRoutes(Depot depot) {
+    public static List<List<Integer>> getInitialRoutes(CrowdedDepot depot) {
         List<Customer> customers = new ArrayList<>(depot.getCustomers());   // make COPY of customers
         Collections.shuffle(customers);                                     // then shuffle copied list
 
@@ -51,4 +51,5 @@ public class RouteScheduler {
         }
         return routes;
     }
+
 }
