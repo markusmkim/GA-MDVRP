@@ -3,6 +3,7 @@ package GA;
 import GA.Components.Individual;
 import GA.Operations.Crossover;
 import GA.Operations.Initializer;
+import GA.Operations.Mutation;
 import GA.Operations.Selection;
 import MDVRP.*;
 
@@ -14,17 +15,19 @@ public class Algorithm {
     private Manager manager;
     private Metrics metrics;
     private Crossover crossover;
-    private int populationSize;
-    private int numberOfGenerations;
-    private double fitnessBias;
+    private Mutation mutation;
+    private int populationSize = 200;
+    private int numberOfGenerations = 1000;
+    private double fitnessBias = 0.8;
+    private double crossoverRate = 0.8;
+    private double mutationRate = 0.006;
+    private int eliteReplacement = 20;
 
     public Algorithm(Manager manager) {
         this.manager = manager;
         this.metrics = new Metrics(manager);
-        this.crossover = new Crossover(manager, this.metrics);
-        this.populationSize = 200;
-        this.numberOfGenerations = 3000;
-        this.fitnessBias = 0.8;
+        this.crossover = new Crossover(manager, this.metrics, this.crossoverRate);
+        this.mutation = new Mutation(this.mutationRate);
     }
 
     public Solution run() {
@@ -65,9 +68,17 @@ public class Algorithm {
 
         // Evaluate fitness
         double averageDistance = this.evaluatePopulation(population);
+        this.evaluateFeasibility(population);
         System.out.println("Generation: 0  |  Population size: " + population.size() + "  | Average total distance: " + averageDistance);
 
         // ---------------------------------------------------------------------------- //
+        Collections.sort(population);
+        List<Individual> bestParents = new ArrayList<>();
+        for (int i = 0; i < this.eliteReplacement; i++) {
+            bestParents.add(population.get(i).getCopy());
+        }
+        this.evaluatePopulation(bestParents);
+        this.evaluateFeasibility(bestParents);
         // For each generation
         for (int generation = 1; generation <= this.numberOfGenerations; generation++) {
             List<Individual> offspring = new ArrayList<>();
@@ -86,6 +97,9 @@ public class Algorithm {
                 Individual[] offspringPair = this.crossover.apply(parent1, parent2);
 
                 // Apply mutation
+                for (Individual offspringIndividual : offspringPair) {
+                    this.mutation.apply(offspringIndividual);
+                }
 
                 // add offspring pair to offspring
                 Collections.addAll(offspring, offspringPair);
@@ -95,14 +109,26 @@ public class Algorithm {
             }
             averageDistance = this.evaluatePopulation(offspring);
             population = offspring;
+            Collections.sort(population);
 
+            // Elitism
+            population = population.subList(0, population.size() - this.eliteReplacement);
+            population.addAll(bestParents);
+            Collections.sort(population);
+            this.evaluateFeasibility(population);
             if (generation % 100 == 0) {
-                System.out.println("Generation: " +
-                        generation +
-                        "  |  Population size: " +
-                        population.size() +
-                        "  | Average total distance: " + averageDistance);
+                System.out.println("Generation: " + generation +
+                        "  |  Population size: " + population.size() +
+                        "  | Average total distance: " + averageDistance +
+                        "  | Best individual distance " + population.get(0).getFitness() +
+                        "  | Best individual is feasible: " + population.get(0).isFeasible());
             }
+            bestParents = new ArrayList<>();
+            for (int i = 0; i < this.eliteReplacement; i++) {
+                bestParents.add(population.get(i).getCopy());
+            }
+            this.evaluatePopulation(bestParents);
+            this.evaluateFeasibility(bestParents);
         }
 
 

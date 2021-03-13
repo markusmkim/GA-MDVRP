@@ -18,7 +18,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Manager manager = new Manager("data/problems/p01", 5);
+        Manager manager = new Manager("data/problems/p02", 5);
 
         Algorithm ga = new Algorithm(manager);
 

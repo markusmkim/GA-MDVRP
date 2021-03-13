@@ -14,12 +14,11 @@ public class Crossover {
     private Metrics metrics;
 
 
-    public Crossover(Manager manager, Metrics metrics) {
-        this.crossoverRate = 0.8;
+    public Crossover(Manager manager, Metrics metrics, double crossoverRate) {
+        this.crossoverRate = crossoverRate;
         this.balanceParameter = 0.8;
         this.manager = manager;
         this.metrics = metrics;
-
     }
 
 
