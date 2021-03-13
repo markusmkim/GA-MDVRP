@@ -16,12 +16,12 @@ public class Algorithm {
     private Metrics metrics;
     private Crossover crossover;
     private Mutation mutation;
-    private int populationSize = 200;
-    private int numberOfGenerations = 1000;
+    private int populationSize = 100;
+    private int numberOfGenerations = 500;
     private double fitnessBias = 0.8;
     private double crossoverRate = 0.8;
-    private double mutationRate = 0.006;
-    private int eliteReplacement = 20;
+    private double mutationRate = 0.003;
+    private int eliteReplacement = 10;
 
     public Algorithm(Manager manager) {
         this.manager = manager;
@@ -39,10 +39,6 @@ public class Algorithm {
         System.out.println("Number of customer: " + numCustomers);
         System.out.println("Number of depots:   " + numDepots);
 
-        //Customer customer10 = customers.get(9);
-        //this.printCustomerInfo(customer10, 10);
-        //this.printBorderCustomers(customers);
-
         System.out.println("------------------------");
         for (CrowdedDepot depot: crowdedDepots) {
             System.out.println(depot.getCustomerIds());
@@ -51,20 +47,7 @@ public class Algorithm {
         // Initialize population
         List<Individual> population = Initializer.init(this.populationSize, crowdedDepots);
         System.out.println("Initial population size: " + population.size());
-        /*
-        boolean check = true;
-        for (Individual individual : population) {
-            for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
-                int key = entry.getKey();
-                List<List<Integer>> chromosomeDepot = entry.getValue();
-                if (! this.metrics.areRoutesFeasible(this.manager.getDepot(key), chromosomeDepot)) {
-                    check = false;
-                    break;
-                }
-            }
-        }
-        System.out.println("All initial routes feasible: " + check);
-         */
+
 
         // Evaluate fitness
         double averageDistance = this.evaluatePopulation(population);
@@ -121,7 +104,8 @@ public class Algorithm {
                         "  |  Population size: " + population.size() +
                         "  | Average total distance: " + averageDistance +
                         "  | Best individual distance " + population.get(0).getFitness() +
-                        "  | Best individual is feasible: " + population.get(0).isFeasible());
+                        "  | Best individual is feasible: " + population.get(0).isFeasible() +
+                        "  | Worst individual distance " + population.get(population.size() - 1).getFitness());
             }
             bestParents = new ArrayList<>();
             for (int i = 0; i < this.eliteReplacement; i++) {
@@ -129,6 +113,11 @@ public class Algorithm {
             }
             this.evaluatePopulation(bestParents);
             this.evaluateFeasibility(bestParents);
+
+            if (generation == this.numberOfGenerations / 2) {
+                System.out.println("Cutting population");
+                population = population.subList(0, population.size() - 21);
+            }
         }
 
 

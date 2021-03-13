@@ -94,7 +94,8 @@ public class Crossover {
 
 
     private void insertCustomerID(Depot depot, Individual individual, int customerID) {
-        List<Insertion> insertions = new ArrayList<>();
+        List<Insertion> feasibleInsertions = new ArrayList<>();
+        List<Insertion> unFeasibleInsertions = new ArrayList<>();
 
         List<List<Integer>> routes  = individual.getChromosome().get(depot.getId());
         int numberOfRoutes = 0;
@@ -102,8 +103,12 @@ public class Crossover {
             for (int index = 0; index < routes.get(routeLoc).size() + 1; index ++) {
                 List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
                 routesCopy.get(routeLoc).add(index, customerID);
-                Insertion insertion = new Insertion(this.metrics, depot, routes, routesCopy);
-                insertions.add(insertion);
+                Insertion insertion = new Insertion(this.manager, this.metrics, depot, routesCopy, customerID, routeLoc, index);
+                if (insertion.isFeasible()) {
+                    feasibleInsertions.add(insertion);
+                } else {
+                    unFeasibleInsertions.add(insertion);
+                }
             }
             numberOfRoutes++;
         }
@@ -111,21 +116,26 @@ public class Crossover {
             List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
             List<Integer> newRoute = new ArrayList<>(Arrays.asList(customerID));
             routesCopy.add(newRoute);
-            Insertion insertion = new Insertion(this.metrics, depot, routes, routesCopy);
-            insertions.add(insertion);
+            Insertion insertion = new Insertion(this.manager, this.metrics, depot, routesCopy, customerID, 0, 0);
+            if (insertion.isFeasible()) {
+                feasibleInsertions.add(insertion);
+            } else {
+                unFeasibleInsertions.add(insertion);
+            }
         }
-        if (insertions.size() == 0) {
-            System.out.println("No insertions");
-            Crossover.printRoutes(routes);
-            System.out.println(individual);
+
+
+        Insertion chosenInsertion;
+        if (Math.random() < this.balanceParameter && feasibleInsertions.size() > 0) {   // Find first feasible insertion
+            chosenInsertion = Insertion.findBest(feasibleInsertions);
         }
-        // sort list
-        Collections.sort(insertions);
-        // System.out.println("Sorted collection" + Arrays.toString(insertions.toArray()));
-        Insertion chosenInsertion = insertions.get(0);
-        if (Math.random() < this.balanceParameter) { // Find first feasible insertion
-            chosenInsertion = insertions.stream().filter(Insertion::isFeasible).findFirst().orElse(insertions.get(0));
+        else {
+            List<Insertion> allInsertions = new ArrayList<>();
+            allInsertions.addAll(feasibleInsertions);
+            allInsertions.addAll(unFeasibleInsertions);
+            chosenInsertion = Insertion.findBest(allInsertions);                       // Else, take best infeasible
         }
+
         // insert
         individual.getChromosome().put(chosenInsertion.getDepot().getId(), chosenInsertion.getResult());
     }
@@ -136,7 +146,6 @@ public class Crossover {
                 for (int ID : IDs) {
                     if (route.contains(ID)) {
                         route.remove(Integer.valueOf(ID));
-
                     }
                 }
             }
