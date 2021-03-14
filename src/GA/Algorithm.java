@@ -16,12 +16,12 @@ public class Algorithm {
     private Metrics metrics;
     private Crossover crossover;
     private Mutation mutation;
-    private int populationSize = 100;
-    private int numberOfGenerations = 500;
+    private int populationSize = 120;
+    private int numberOfGenerations = 1000;
     private double fitnessBias = 0.8;
     private double crossoverRate = 0.8;
-    private double mutationRate = 0.003;
-    private int eliteReplacement = 10;
+    private double mutationRate = 0.05;
+    private int eliteReplacement = 20;
 
     public Algorithm(Manager manager) {
         this.manager = manager;

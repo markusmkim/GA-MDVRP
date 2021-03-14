@@ -19,7 +19,7 @@ public class Metrics {
     // FITNESS FUNCTION
     public double getTotalDistance(Individual individual) {
         List<Depot> depots = this.manager.getDepots();
-        int totalDistance = 0;
+        double totalDistance = 0;
         for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
             int key = entry.getKey();
             List<List<Integer>> chromosomeDepot = entry.getValue();
@@ -47,7 +47,7 @@ public class Metrics {
         }
 
         // System.out.println("\nCalculation new route \n----------------------------------");
-        int totalDistance = 0;
+        double totalDistance = 0;
 
         Depot depot = this.manager.getDepot(depotID);
         int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
