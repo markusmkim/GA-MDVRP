@@ -65,34 +65,6 @@ public class Individual implements Comparable<Individual> {
     }
 
 
-    public static void main(String[] args) {
-        Map<Integer, List<List<Integer>>> cc = new HashMap<>();
-        for (int key = 1; key <= 2; key++) {
-            List<List<Integer>> ccc = new ArrayList<>();
-            for (int routesIndex = 2; routesIndex < 5; routesIndex++) {
-                List<Integer> cccc = new ArrayList<>();
-                for (int routeIndex = 4; routeIndex < 6; routeIndex++) {
-                    cccc.add(1);
-                }
-                ccc.add(cccc);
-            }
-            cc.put(key, ccc);
-        }
-        Individual ind = new Individual(cc);
-        Individual copy = ind.getCopy();
-        ind.getChromosome().get(1).get(0).remove(0);
-        ind.getChromosome().get(1).get(0).add(10);
-        List<List<Integer>> r = new ArrayList<>();
-        List<Integer> rr = new ArrayList<>();
-        rr.add(3);
-        rr.add(8);
-        r.add(rr);
-        rr.add(10);
-        copy.getChromosome().put(0, r);
-        System.out.println(ind);
-        System.out.println(copy);
-    }
-
     @Override
     public int compareTo(Individual individual) {
         if (this.isFeasible && !individual.isFeasible()) {

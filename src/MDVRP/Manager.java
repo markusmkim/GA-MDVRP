@@ -1,6 +1,7 @@
 package MDVRP;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.lang.Math;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import GA.Components.Individual;
 import GA.Operations.Selection;
 import Utils.Euclidian;
+import Utils.Formatter;
 
 
 public class Manager {
@@ -171,6 +173,55 @@ public class Manager {
 
         return depots;
     }
+
+
+    public static void saveSolution(Solution solution, String outputPath) {
+        File file;
+        FileWriter filewriter = null;
+
+        try {
+            file = new File(outputPath);
+
+            filewriter = new FileWriter(file);
+
+            // Write total solution cost (distance)
+            filewriter.write("" + solution.getIndividual().getFitness());
+
+            for (Map.Entry<Integer, List<List<Integer>>> entry : solution.getIndividual().getChromosome().entrySet()) {
+                int depotID = entry.getKey();
+                List<Double> routesDemand = solution.getRoutesDemand().get(depotID);
+                List<Double> routesDistance = solution.getRoutesDistance().get(depotID);
+
+                List<List<Integer>> depotRoutes = entry.getValue();
+
+                for (int i = 0; i < depotRoutes.size(); i++) {
+                    List<Integer> route = depotRoutes.get(i);
+                    double routeDemand = routesDemand.get(i);
+                    double routeDistance = routesDistance.get(i);
+                    int vehicleID = i + 1;
+
+                    // Write output line to file
+                    filewriter.write("\n" + Formatter.formatOutputLine(depotID, vehicleID, routeDistance, routeDemand, route));
+                }
+            }
+
+            filewriter.close();  // Close stream
+            System.out.println("Solution saved");
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (filewriter != null) {
+                    filewriter.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 
 }

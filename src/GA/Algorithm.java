@@ -114,10 +114,12 @@ public class Algorithm {
             this.evaluatePopulation(bestParents);
             this.evaluateFeasibility(bestParents);
 
+            /*
             if (generation == this.numberOfGenerations / 2) {
                 System.out.println("Cutting population");
                 population = population.subList(0, population.size() - 21);
             }
+             */
         }
 
 
@@ -142,7 +144,7 @@ public class Algorithm {
         }
 
 
-        return new Solution(solutionDepots, bestIndividual);
+        return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
 
 
