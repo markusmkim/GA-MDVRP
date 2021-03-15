@@ -92,13 +92,14 @@ public class Algorithm {
             }
             averageDistance = this.evaluatePopulation(offspring);
             population = offspring;
+            this.evaluateFeasibility(population);
             Collections.sort(population);
 
             // Elitism
             population = population.subList(0, population.size() - this.eliteReplacement);
             population.addAll(bestParents);
             Collections.sort(population);
-            this.evaluateFeasibility(population);
+
             if (generation % 100 == 0) {
                 System.out.println("Generation: " + generation +
                         "  |  Population size: " + population.size() +
