@@ -1,7 +1,6 @@
 package GA.Operations;
 
 import GA.Components.Individual;
-import GA.Metrics;
 import MDVRP.Depot;
 import MDVRP.Manager;
 
@@ -11,14 +10,14 @@ public class Crossover {
     private double crossoverRate;
     private double balanceParameter;
     private Manager manager;
-    private Metrics metrics;
+    private Inserter inserter;
 
 
-    public Crossover(Manager manager, Metrics metrics, double crossoverRate) {
+    public Crossover(Manager manager, Inserter inserter, double crossoverRate) {
         this.crossoverRate = crossoverRate;
         this.balanceParameter = 0.8;
         this.manager = manager;
-        this.metrics = metrics;
+        this.inserter = inserter;
     }
 
 
@@ -74,12 +73,12 @@ public class Crossover {
         // for (List<List<Integer>> routes : parentCopy1.getChromosome().get(chosenDepotId))
         for (Integer customerID : parent1RandomRoute) {
             // add all ids somewhere in parentCopy2
-            this.insertCustomerID(chosenDepot, parent2, customerID);
+            this.inserter.insertCustomerID(chosenDepot, parent2, customerID, this.balanceParameter);
         }
 
         for (Integer customerID : parent2RandomRoute) {
             // add all ids somewhere in parentCopy1
-            this.insertCustomerID(chosenDepot, parent1, customerID);
+            this.inserter.insertCustomerID(chosenDepot, parent1, customerID, this.balanceParameter);
         }
         /*
         System.out.println("After insertion");
@@ -92,53 +91,6 @@ public class Crossover {
         return new Individual[]{parent1, parent2};
     }
 
-
-    private void insertCustomerID(Depot depot, Individual individual, int customerID) {
-        List<Insertion> feasibleInsertions = new ArrayList<>();
-        List<Insertion> unFeasibleInsertions = new ArrayList<>();
-
-        List<List<Integer>> routes  = individual.getChromosome().get(depot.getId());
-        int numberOfRoutes = 0;
-        for (int routeLoc = 0; routeLoc < routes.size(); routeLoc++) {
-            for (int index = 0; index < routes.get(routeLoc).size() + 1; index ++) {
-                List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
-                routesCopy.get(routeLoc).add(index, customerID);
-                Insertion insertion = new Insertion(this.manager, this.metrics, depot, routesCopy, customerID, routeLoc, index);
-                if (insertion.isFeasible()) {
-                    feasibleInsertions.add(insertion);
-                } else {
-                    unFeasibleInsertions.add(insertion);
-                }
-            }
-            numberOfRoutes++;
-        }
-        if (numberOfRoutes < depot.getMaxVehicles()) {
-            List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
-            List<Integer> newRoute = new ArrayList<>(Arrays.asList(customerID));
-            routesCopy.add(newRoute);
-            Insertion insertion = new Insertion(this.manager, this.metrics, depot, routesCopy, customerID, 0, 0);
-            if (insertion.isFeasible()) {
-                feasibleInsertions.add(insertion);
-            } else {
-                unFeasibleInsertions.add(insertion);
-            }
-        }
-
-
-        Insertion chosenInsertion;
-        if (Math.random() < this.balanceParameter && feasibleInsertions.size() > 0) {   // Find first feasible insertion
-            chosenInsertion = Insertion.findBest(feasibleInsertions);
-        }
-        else {
-            List<Insertion> allInsertions = new ArrayList<>();
-            allInsertions.addAll(feasibleInsertions);
-            allInsertions.addAll(unFeasibleInsertions);
-            chosenInsertion = Insertion.findBest(allInsertions);                       // Else, take best infeasible
-        }
-
-        // insert
-        individual.getChromosome().put(chosenInsertion.getDepot().getId(), chosenInsertion.getResult());
-    }
 
     private void removeCustomerIDsFromRoutes(List<List<List<Integer>>> routesAcrossAllDepots, List<Integer> IDs) {
         for (List<List<Integer>> routes : routesAcrossAllDepots) {
@@ -153,16 +105,6 @@ public class Crossover {
         }
     }
 
-
-
-    public static List<List<Integer>> copyDepotRoutes(List<List<Integer>> routes) {
-        List<List<Integer>> copy = new ArrayList<>();
-        for (List<Integer> route : routes) {
-            List<Integer> routeCopy = new ArrayList<>(route);
-            copy.add(routeCopy);
-        }
-        return copy;
-    }
 
     private static void printRoutes(List<List<Integer>> routes) {
         String s = "";

@@ -15,6 +15,7 @@ import Utils.Formatter;
 
 public class Manager {
     private List<Customer> customers = new ArrayList<>();
+    private List<Customer> swappableCustomers = new ArrayList<>();
     private List<Depot> depots = new ArrayList<>();
     private double borderlineThreshold;
 
@@ -26,8 +27,9 @@ public class Manager {
     }
 
 
-    public List<Customer> getCustomers() { return this.customers; }
-    public List<Depot> getDepots()       { return this.depots; }
+    public List<Customer> getCustomers()            { return this.customers; }
+    public List<Customer> getSwappableCustomers()   { return swappableCustomers; }
+    public List<Depot> getDepots()                  { return this.depots; }
 
     public Customer getCustomer(int id) {
         return this.customers.stream().filter(c -> id == c.getId()).findAny().orElse(null);
@@ -119,41 +121,41 @@ public class Manager {
 
         for (Customer customer: this.customers) {
             boolean isBorderlineCustomer = false;
+            Map<Integer, Double> depotDistances = new HashMap<>();
             int[] customerCoordinates = new int[]{customer.getX(), customer.getY()};
 
             // initial values
             CrowdedDepot firstDepot = depots.get(0);
             double shortestDistance = 1000000000;
             CrowdedDepot currentShortestDepot = firstDepot;
-            double shortestOtherDistance = 1000000000;
 
             // loop through depots to find the nearest depot and the distance to that depot,
             // and also the distance to second nearest depot (to check if on borderline)
             for (CrowdedDepot depot: depots) {
                 int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
                 double distance = Euclidian.distance(customerCoordinates, depotCoordinates);
+                depotDistances.put(depot.getId(), distance);
                 if (distance < shortestDistance) {
-                    if (distance < shortestOtherDistance) {
-                        shortestOtherDistance = shortestDistance;
-                    }
                     shortestDistance = distance;
                     currentShortestDepot = depot;
                 }
-                else if (distance < shortestOtherDistance) {
-                    shortestOtherDistance = distance;
-                }
-            }
-
-            // check if customer is on borderline between nearest and second nearest depot, with margin = threshold
-            if (Math.abs(shortestDistance - shortestOtherDistance) < this.borderlineThreshold) {
-                isBorderlineCustomer = true;
             }
 
             // add customer to the depot closest to the customer
             currentShortestDepot.addCustomer(customer);
-            if (isBorderlineCustomer) {
-                customer.setOnBorderline();
+            customer.addPossibleDepot(currentShortestDepot.getId());
+
+            for (Map.Entry<Integer, Double> entry : depotDistances.entrySet()) {
+                if ((entry.getValue() - shortestDistance) / shortestDistance < this.borderlineThreshold && entry.getKey() != currentShortestDepot.getId()) {
+                    customer.addPossibleDepot(entry.getKey());
+                    isBorderlineCustomer = true;
+                }
             }
+
+            if (isBorderlineCustomer) {
+                this.swappableCustomers.add(customer);
+            }
+
         }
         return depots;
     }

@@ -1,10 +1,7 @@
 package GA;
 
 import GA.Components.Individual;
-import GA.Operations.Crossover;
-import GA.Operations.Initializer;
-import GA.Operations.Mutation;
-import GA.Operations.Selection;
+import GA.Operations.*;
 import MDVRP.*;
 
 import java.util.*;
@@ -16,19 +13,34 @@ public class Algorithm {
     private Metrics metrics;
     private Crossover crossover;
     private Mutation mutation;
-    private int populationSize = 120;
-    private int numberOfGenerations = 1000;
-    private double fitnessBias = 0.8;
-    private double crossoverRate = 0.8;
-    private double mutationRate = 0.05;
-    private int eliteReplacement = 20;
+    private int populationSize;
+    private int numberOfGenerations;
+    private double fitnessBias;
+    private int eliteReplacement;
+
 
     public Algorithm(Manager manager) {
+        // ------------------- PARAMS -------------------- //
+        int populationSize = 100;
+        int numberOfGenerations = 600;
+        double fitnessBias = 0.8;
+        double crossoverRate = 0.8;
+        double mutationRate = 0.05;
+        int eliteReplacement = 20;
+        int interDepotMutationFreq = 10;
+        // ------------------------------------------------//
+
+        this.populationSize = populationSize;
+        this.numberOfGenerations = numberOfGenerations;
+        this.fitnessBias = fitnessBias;
+        this.eliteReplacement = eliteReplacement;
         this.manager = manager;
         this.metrics = new Metrics(manager);
-        this.crossover = new Crossover(manager, this.metrics, this.crossoverRate);
-        this.mutation = new Mutation(this.mutationRate);
+        Inserter inserter = new Inserter(manager, this.metrics);
+        this.crossover = new Crossover(manager, inserter, crossoverRate);
+        this.mutation = new Mutation(manager, inserter, mutationRate, interDepotMutationFreq);
     }
+
 
     public Solution run() {
         List<Customer> customers = this.manager.getCustomers();
@@ -43,6 +55,9 @@ public class Algorithm {
         for (CrowdedDepot depot: crowdedDepots) {
             System.out.println(depot.getCustomerIds());
         }
+
+        System.out.println("borderline customers");
+        this.printBorderCustomers();
 
         // Initialize population
         List<Individual> population = Initializer.init(this.populationSize, crowdedDepots);
@@ -81,7 +96,7 @@ public class Algorithm {
 
                 // Apply mutation
                 for (Individual offspringIndividual : offspringPair) {
-                    this.mutation.apply(offspringIndividual);
+                    this.mutation.apply(offspringIndividual, generation);
                 }
 
                 // add offspring pair to offspring
@@ -140,11 +155,13 @@ public class Algorithm {
         System.out.println(bestIndividual);
         this.printRouteDemands(bestIndividual);
         List<CrowdedDepot> solutionDepots = this.manager.assignCustomerToDepotsFromIndividual(bestIndividual);
+        int aa = 0;
         for (CrowdedDepot depot: solutionDepots) {
             System.out.println(depot.getCustomerIds());
+            aa += depot.getCustomers().size();
         }
 
-
+        System.out.println("Number of customers in solution: " + aa);
         return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
 
@@ -158,12 +175,11 @@ public class Algorithm {
         System.out.println("Duration:           " + customer.getDuration());
         System.out.println("Demand:             " + customer.getDemand());
     }
-    private void printBorderCustomers(List<Customer> customers) {
+
+    private void printBorderCustomers() {
         List<Integer> borderLineCustomerIds = new ArrayList<>();
-        for (Customer customer: customers) {
-            if (customer.getOnBorder()) {
-                borderLineCustomerIds.add(customer.getId());
-            }
+        for (Customer customer: this.manager.getSwappableCustomers()) {
+            borderLineCustomerIds.add(customer.getId());
         }
         String borderLineCustomerIdsString = Arrays.toString(borderLineCustomerIds.toArray());
         System.out.println("\nCustomers on borderline:");

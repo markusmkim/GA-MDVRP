@@ -1,34 +1,42 @@
 package GA.Operations;
 
 import GA.Components.Individual;
+import MDVRP.Customer;
+import MDVRP.Depot;
+import MDVRP.Manager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Mutation {
+    private Manager manager;
+    private Inserter inserter;
     private double mutationRate;
+    private int interDepotFreq;
 
-    public Mutation(double mutationRate) {
+    public Mutation(Manager manager, Inserter inserter, double mutationRate, int interDepotFreq) {
+        this.manager = manager;
+        this.inserter = inserter;
         this.mutationRate = mutationRate;
+        this.interDepotFreq = interDepotFreq;
     }
 
 
-    public void apply(Individual individual) {
+    public void apply(Individual individual, int generation) {
         if (Math.random() < mutationRate) {
-            this.applyReversal(individual);
+            if (generation % this.interDepotFreq == 0) {
+                this.applyInterDepotSwapping(individual);
+            }
+            else {
+                this.applyReversal(individual);
+            }
         }
     }
 
 
     private void applyReversal(Individual individual) {
-        // System.out.println("Before mutation");
-        // System.out.println(individual);
         Random random = new Random();
         List<Integer> depotIDs = new ArrayList<>(individual.getChromosome().keySet());
         int chosenDepotId = depotIDs.get(random.nextInt(depotIDs.size()));
-        // System.out.println("Chosen depot " + chosenDepotId);
 
         List<List<Integer>> routes = individual.getChromosome().get(chosenDepotId);
         List<Integer> routesFlattened = new ArrayList<>();
@@ -54,7 +62,7 @@ public class Mutation {
             cutFrom = cutPoint2;
             cutTo = cutPoint1;
         }
-        // System.out.println("Cut from " + cutFrom + ", cut to " + cutTo);
+
         List<Integer> reversedSegment = new ArrayList<>();
         for (int i = cutTo; i >= cutFrom; i--) {
             reversedSegment.add(routesFlattened.get(i));
@@ -79,7 +87,39 @@ public class Mutation {
 
         // apply mutation to chromosome
         individual.getChromosome().put(chosenDepotId, augmentedRoutes);
-        // System.out.println("After mutation");
-        // System.out.println(individual);
     }
+
+
+    private void applyInterDepotSwapping(Individual individual) {
+        Random random = new Random();
+        List<Customer> candidates = this.manager.getSwappableCustomers();
+        Customer chosenCustomer = candidates.get(random.nextInt(candidates.size()));  // choose random customer to swap
+        int chosenCustomerID = chosenCustomer.getId();
+        int wasAtDepotID = 0;
+        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
+            boolean breakLoop = false;
+            int key = entry.getKey();
+            for (List<Integer> route: entry.getValue()) {
+                if (route.contains(chosenCustomerID)) {
+                    wasAtDepotID = key;
+                    route.remove(Integer.valueOf(chosenCustomerID));
+                    breakLoop = true;
+                    break;
+                }
+            }
+            entry.getValue().removeIf(List::isEmpty);  // Remove empty routes
+            if (breakLoop) {
+                break;
+            }
+        }
+        List<Integer> possibleDepotIDs = new ArrayList<>(chosenCustomer.getPossibleDepots());
+        if (possibleDepotIDs.contains(wasAtDepotID)) {
+            possibleDepotIDs.remove(Integer.valueOf(wasAtDepotID));
+        }
+
+        int chosenNextDepotID = possibleDepotIDs.get(random.nextInt(possibleDepotIDs.size()));
+        Depot chosenDepot = this.manager.getDepot(chosenNextDepotID);
+        this.inserter.insertCustomerID(chosenDepot, individual, chosenCustomerID, 1);
+    }
+
 }

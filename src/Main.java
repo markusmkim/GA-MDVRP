@@ -18,7 +18,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Manager manager = new Manager("data/problems/p16", 5);
+        Manager manager = new Manager("data/problems/p23", 0.5);
 
         Algorithm ga = new Algorithm(manager);
 
@@ -30,7 +30,7 @@ public class Main extends Application {
         System.out.println("\nTotal distance best solution: " + solutionCost);
 
         // Save solution to file
-        Manager.saveSolution(solution, "data/solutions/p16.res");
+        Manager.saveSolution(solution, "data/solutions/p23.res");
 
 
         Canvas canvas = new Canvas(420, 420);                 // Create the Canvas
