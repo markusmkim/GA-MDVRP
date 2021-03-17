@@ -24,10 +24,12 @@ public class Customer {
     }
 
     public void addPossibleDepot(int possibleDepotsID) {
+        this.possibleDepotsIDs.add(possibleDepotsID);
+    }
+    public void setOnBorderline() {
         if (! this.onBorderline) {
             this.onBorderline = true;
         }
-        this.possibleDepotsIDs.add(possibleDepotsID);
     }
 
     public int getId()                          { return id; }

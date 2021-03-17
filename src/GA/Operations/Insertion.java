@@ -23,7 +23,7 @@ public class Insertion implements Comparable<Insertion> {
         this.depot = depot;
 
         this.cost = this.insertionCost(augmentedRoutes, customerID, routeLoc, index);
-        this.isFeasible = metrics.areRoutesFeasible(depot, augmentedRoutes);
+        this.isFeasible = metrics.checkRoutes(depot, augmentedRoutes.get(routeLoc));
 
         this.result = augmentedRoutes;
     }

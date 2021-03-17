@@ -1,6 +1,7 @@
 package GA;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import GA.Operations.*;
 import MDVRP.*;
 
@@ -22,7 +23,7 @@ public class Algorithm {
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
         int populationSize = 100;
-        int numberOfGenerations = 600;
+        int numberOfGenerations = 1000;
         double fitnessBias = 0.8;
         double crossoverRate = 0.8;
         double mutationRate = 0.05;
@@ -38,7 +39,7 @@ public class Algorithm {
         this.metrics = new Metrics(manager);
         Inserter inserter = new Inserter(manager, this.metrics);
         this.crossover = new Crossover(manager, inserter, crossoverRate);
-        this.mutation = new Mutation(manager, inserter, mutationRate, interDepotMutationFreq);
+        this.mutation = new Mutation(manager, this.metrics, inserter, mutationRate, interDepotMutationFreq);
     }
 
 
@@ -60,7 +61,7 @@ public class Algorithm {
         this.printBorderCustomers();
 
         // Initialize population
-        List<Individual> population = Initializer.init(this.populationSize, crowdedDepots);
+        List<Individual> population = Initializer.init(this.populationSize, crowdedDepots, this.metrics);
         System.out.println("Initial population size: " + population.size());
 
 
@@ -73,7 +74,7 @@ public class Algorithm {
         Collections.sort(population);
         List<Individual> bestParents = new ArrayList<>();
         for (int i = 0; i < this.eliteReplacement; i++) {
-            bestParents.add(population.get(i).getCopy());
+            bestParents.add(population.get(i).getClone());
         }
         this.evaluatePopulation(bestParents);
         this.evaluateFeasibility(bestParents);
@@ -125,7 +126,7 @@ public class Algorithm {
             }
             bestParents = new ArrayList<>();
             for (int i = 0; i < this.eliteReplacement; i++) {
-                bestParents.add(population.get(i).getCopy());
+                bestParents.add(population.get(i).getClone());
             }
             this.evaluatePopulation(bestParents);
             this.evaluateFeasibility(bestParents);
@@ -153,13 +154,16 @@ public class Algorithm {
         Individual bestIndividual = population.get(0);
         System.out.println("Result is feasible " + bestIndividual.isFeasible());
         System.out.println(bestIndividual);
-        this.printRouteDemands(bestIndividual);
+
         List<CrowdedDepot> solutionDepots = this.manager.assignCustomerToDepotsFromIndividual(bestIndividual);
         int aa = 0;
         for (CrowdedDepot depot: solutionDepots) {
             System.out.println(depot.getCustomerIds());
             aa += depot.getCustomers().size();
         }
+
+        System.out.println("Total distance old metric");
+        System.out.println(this.metrics.getTotalDistanceOLD(bestIndividual));
 
         System.out.println("Number of customers in solution: " + aa);
         return new Solution(solutionDepots, bestIndividual, this.metrics);
@@ -210,21 +214,16 @@ public class Algorithm {
 
     private void printRouteDemands(Individual individual) {
         System.out.println("Route demands");
-        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
             int key = entry.getKey();
             System.out.println("Depot " + key);
-            List<List<Integer>> chromosomeDepot = entry.getValue();
+            List<Route> chromosomeDepot = entry.getValue();
             int routeIndex = 1;
-            for (List<Integer> route: chromosomeDepot) {
-                int demand = 0;
-                for (int customerID : route) {
-                    Customer c = this.manager.getCustomer(customerID);
-                    demand += c.getDemand();
-                }
+            for (Route route: chromosomeDepot) {
+                int demand = route.getDemand();
                 System.out.println("Route " + routeIndex + ": " + demand);
                 routeIndex++;
             }
         }
     }
-
 }

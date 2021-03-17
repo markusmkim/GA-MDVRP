@@ -5,11 +5,11 @@ import java.util.*;
 
 public class Individual implements Comparable<Individual> {
     private double fitness;
-    private Map<Integer, List<List<Integer>>> chromosome;  // length = number of depots
+    private Map<Integer, List<Route>> chromosome;  // length = number of depots
     private boolean isFeasible;
 
 
-    public Individual(Map<Integer, List<List<Integer>>> initialChromosome) {
+    public Individual(Map<Integer, List<Route>> initialChromosome) {
         this.chromosome = initialChromosome;
     }
 
@@ -25,17 +25,17 @@ public class Individual implements Comparable<Individual> {
     }
 
 
-    public Map<Integer, List<List<Integer>>> getChromosome() { return chromosome; }
+    public Map<Integer, List<Route>> getChromosome() { return chromosome; }
 
     @Override
     public String toString() {
         String s = "";
-        for (Map.Entry<Integer, List<List<Integer>>> entry : this.chromosome.entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : this.chromosome.entrySet()) {
             int key = entry.getKey();
-            List<List<Integer>> chromosomeDepot = entry.getValue();
+            List<Route> chromosomeDepot = entry.getValue();
             s += "Depot" + key + ": ";
-            for (List<Integer> route: chromosomeDepot) {
-                s += Arrays.toString(route.toArray()) + " - ";
+            for (Route route: chromosomeDepot) {
+                s += Arrays.toString(route.getRoute().toArray()) + " - ";
             }
             s = s.substring(0, s.length() - 3);
             s += "|  ";
@@ -45,18 +45,18 @@ public class Individual implements Comparable<Individual> {
     }
 
 
-    public Individual getCopy() {
+    public Individual getClone() {
         /**
          * Clone individual without fitness and isFeasible
          */
-        Map<Integer, List<List<Integer>>> chromosomeCopy = new HashMap<>();
+        Map<Integer, List<Route>> chromosomeCopy = new HashMap<>();
 
-        for (Map.Entry<Integer, List<List<Integer>>> entry : this.chromosome.entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : this.chromosome.entrySet()) {
             int key = entry.getKey();
-            List<List<Integer>> chromosomeDepot = entry.getValue();
-            List<List<Integer>> chromosomeDepotCopy = new ArrayList<>();
-            for (List<Integer> route: chromosomeDepot) {
-                List<Integer> routeCopy = new ArrayList<>(route);
+            List<Route> chromosomeDepot = entry.getValue();
+            List<Route> chromosomeDepotCopy = new ArrayList<>();
+            for (Route route: chromosomeDepot) {
+                Route routeCopy = route.getClone();
                 chromosomeDepotCopy.add(routeCopy);
             }
             chromosomeCopy.put(key, chromosomeDepotCopy);

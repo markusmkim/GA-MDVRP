@@ -1,5 +1,6 @@
 import GA.Algorithm;
 import GA.Components.Individual;
+import GA.Components.Route;
 import MDVRP.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -81,17 +82,17 @@ public class Main extends Application {
 
 
     private void drawRoutes(GraphicsContext gc, CrowdedDepot depot, Individual individual) {
-        List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
+        List<Route> routes = individual.getChromosome().get(depot.getId());
 
-        for (List<Integer> route : routes) {
-            double[] xPoints = new double[route.size() + 1];
-            double[] yPoints = new double[route.size() + 1];
+        for (Route route : routes) {
+            double[] xPoints = new double[route.getRoute().size() + 1];
+            double[] yPoints = new double[route.getRoute().size() + 1];
 
             xPoints[0] = depot.getX() * 5;
             yPoints[0] = depot.getY() * 5;
 
-            for (int i = 0; i < route.size(); i++) {
-                Customer customer = depot.getCustomer(route.get(i));
+            for (int i = 0; i < route.getRoute().size(); i++) {
+                Customer customer = depot.getCustomer(route.getRoute().get(i));
                 xPoints[i + 1] = customer.getX() * 5;
                 yPoints[i + 1] = customer.getY() * 5;
             }

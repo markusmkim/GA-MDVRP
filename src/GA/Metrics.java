@@ -1,6 +1,7 @@
 package GA;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import MDVRP.Customer;
 import MDVRP.Depot;
 import MDVRP.Manager;
@@ -17,19 +18,19 @@ public class Metrics {
     }
 
     // FITNESS FUNCTION
-    public double getTotalDistance(Individual individual) {
+    public double getTotalDistanceOLD(Individual individual) {
         List<Depot> depots = this.manager.getDepots();
         double totalDistance = 0;
-        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
             int key = entry.getKey();
-            List<List<Integer>> chromosomeDepot = entry.getValue();
-            for (List<Integer> route : chromosomeDepot) {
+            List<Route> chromosomeDepot = entry.getValue();
+            for (Route route : chromosomeDepot) {
                 Depot depot = depots.stream().filter(d -> key == d.getId()).findAny().orElse(null);// find depot
                 if (depot == null) {
                     System.out.println("Something wring, depot = null in Metrics.getTotalDistance");
                     depot = depots.get(0);
                 }
-                totalDistance += this.getRouteDistance(depot.getId(), route);                                 // get distance
+                totalDistance += this.getRouteDistance(depot.getId(), route.getRoute());                                 // get distance
 
                 // Print route demand
                 // double routeDemand = this.getRouteDemand(route);
@@ -37,6 +38,57 @@ public class Metrics {
             }
         }
         return totalDistance;
+    }
+
+
+    public double getTotalDistance(Individual individual) {
+        double totalDistance = 0;
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
+            List<Route> chromosomeDepot = entry.getValue();
+            for (Route route : chromosomeDepot) {
+                totalDistance += route.getDistance();     // get distance
+            }
+        }
+        return totalDistance;
+    }
+
+
+    public void evaluateRoute(int depotID, Route route) {
+        if (route.getRoute().size() == 0) {
+            return;
+        }
+
+        double totalDistance = 0;
+        int totalDemand = 0;
+
+        Depot depot = this.manager.getDepot(depotID);
+        int[] depotCoordinates = new int[]{depot.getX(), depot.getY()};
+
+        // Add distance from depot to first customer
+        Customer toCustomer = this.manager.getCustomer(route.getRoute().get(0));
+        int[] toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
+        totalDistance += Euclidian.distance(depotCoordinates, toCustomerCoordinates);
+
+        // Add distances between customers
+        Customer fromCustomer = toCustomer;
+        for (int i = 1; i < route.getRoute().size(); i++) {
+            totalDemand += fromCustomer.getDemand();
+
+            int[] fromCustomerCoordinates = new int[]{fromCustomer.getX(), fromCustomer.getY()};
+
+            toCustomer = this.manager.getCustomer(route.getRoute().get(i));
+            toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
+
+            totalDistance += Euclidian.distance(fromCustomerCoordinates, toCustomerCoordinates);
+            fromCustomer = toCustomer;
+        }
+        totalDemand += fromCustomer.getDemand();
+
+        // Add distance from last customer and back to depot
+        totalDistance += Euclidian.distance(toCustomerCoordinates, depotCoordinates);
+
+        route.setDistance(totalDistance);
+        route.setDemand(totalDemand);
     }
 
 
@@ -84,10 +136,10 @@ public class Metrics {
 
     public boolean isIndividualFeasible(Individual individual) {
         List<Depot> depots = this.manager.getDepots();
-        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
             int key = entry.getKey();
             Depot depot = depots.stream().filter(d -> key == d.getId()).findAny().orElse(null);// find depot
-            List<List<Integer>> routes = entry.getValue();
+            List<Route> routes = entry.getValue();
             if (! this.areRoutesFeasible(depot, routes)) {
                 return false;
             }
@@ -95,33 +147,33 @@ public class Metrics {
         return true;
     }
 
-    public boolean areRoutesFeasible(Depot depot, List<List<Integer>> routes) {
-        //System.out.println("Checking feasible");
-        //System.out.println("Depot max vehicles           : " + depot.getMaxVehicles());
-        //System.out.println("Depot max route vehicle load : " + depot.getMaxVehicleLoad());
-        //System.out.println("Depot max duration per route : " + depot.getMaxDuration());
+
+    public boolean areRoutesFeasible(Depot depot, List<Route> routes) {
         int numberOfVehiclesInUse = 0;
-        for (List<Integer> route : routes) {
-            int duration = 0;
-            int demand = 0;
-            for (int customerID : route) {
-                Customer customer = this.manager.getCustomer(customerID);
-                duration += customer.getDuration();
-                demand += customer.getDemand();
-            }
-            //System.out.println("Route demand     :" + demand);
-            //System.out.println("Route duration   :" + duration);
-            if (duration > depot.getMaxDuration() || demand > depot.getMaxVehicleLoad()) {
-                // System.out.println("Returning false");
+        for (Route route : routes) {
+            int demand = route.getDemand();
+            int maxDuration = depot.getMaxDuration();
+
+            double duration = maxDuration == 0 ? 0 : route.getDistance();
+            if (duration > maxDuration || demand > depot.getMaxVehicleLoad()) {
                 return false;
             }
             numberOfVehiclesInUse++;
         }
-        //System.out.println("Vehicles in use");
-        //boolean a = numberOfVehiclesInUse <= depot.getMaxVehicles();
-        //System.out.println("Returning" + a);
-        //System.out.println("Done checking feasible\n");
+
         return numberOfVehiclesInUse <= depot.getMaxVehicles();
+    }
+
+
+    public boolean checkRoutes(Depot depot, List<Integer> route) {
+        int demand = 0;
+        for (int customerID : route) {
+            Customer customer = this.manager.getCustomer(customerID);
+            demand += customer.getDemand();
+        }
+        int maxDuration = depot.getMaxDuration();
+        double duration = maxDuration == 0 ? 0 : this.getRouteDistance(depot.getId(), route);
+        return duration <= maxDuration && demand <= depot.getMaxVehicleLoad();
     }
 
 

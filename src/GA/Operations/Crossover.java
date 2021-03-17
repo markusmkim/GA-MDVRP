@@ -1,6 +1,7 @@
 package GA.Operations;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import MDVRP.Depot;
 import MDVRP.Manager;
 
@@ -15,7 +16,7 @@ public class Crossover {
 
     public Crossover(Manager manager, Inserter inserter, double crossoverRate) {
         this.crossoverRate = crossoverRate;
-        this.balanceParameter = 0.8;
+        this.balanceParameter = 1;
         this.manager = manager;
         this.inserter = inserter;
     }
@@ -35,40 +36,26 @@ public class Crossover {
         Depot chosenDepot = depots.stream().filter(d -> chosenDepotId == d.getId()).findAny().orElse(null);
 
         // Copy parents to avoid cross reference bugs
-        Individual parent1 = p1.getCopy();
-        Individual parent2 = p2.getCopy();
+        Individual parent1 = p1.getClone();
+        Individual parent2 = p2.getClone();
 
         // Choose random routes
         List<Integer> parent1RandomRoute = new ArrayList<>(parent1.
                 getChromosome().
                 get(chosenDepotId).
-                get(random.nextInt(parent1.getChromosome().get(chosenDepotId).size())));
+                get(random.nextInt(parent1.getChromosome().get(chosenDepotId).size())).getRoute());
 
         List<Integer> parent2RandomRoute = new ArrayList<>(parent2.
                 getChromosome().
                 get(chosenDepotId).
-                get(random.nextInt(parent2.getChromosome().get(chosenDepotId).size())));
+                get(random.nextInt(parent2.getChromosome().get(chosenDepotId).size())).getRoute());
 
-        /*
-        System.out.println("\n----------------------------------------------------------------------------------------\n");
-        System.out.println("Before");
-        System.out.println(parent1);
-        System.out.println(parent2);
-
-        System.out.println("Choosing route " + Arrays.toString(parent1RandomRoute.toArray()) + "from parent 1");
-        System.out.println("Choosing route " + Arrays.toString(parent2RandomRoute.toArray()) + "from parent 2");
-         */
 
 
         // Remove customers in parent 1 random route from parent 2, and vice versa
         this.removeCustomerIDsFromRoutes(new ArrayList<>(parent2.getChromosome().values()), parent1RandomRoute);
         this.removeCustomerIDsFromRoutes(new ArrayList<>(parent1.getChromosome().values()), parent2RandomRoute);
 
-        /*
-        System.out.println("After removing");
-        System.out.println(parent1);
-        System.out.println(parent2);
-         */
 
         // for (List<List<Integer>> routes : parentCopy1.getChromosome().get(chosenDepotId))
         for (Integer customerID : parent1RandomRoute) {
@@ -80,28 +67,19 @@ public class Crossover {
             // add all ids somewhere in parentCopy1
             this.inserter.insertCustomerID(chosenDepot, parent1, customerID, this.balanceParameter);
         }
-        /*
-        System.out.println("After insertion");
-        System.out.println(parent1);
-        System.out.println(parent2);
-        System.out.println("\n----------------------------------------------------------------------------------------\n");
-
-         */
 
         return new Individual[]{parent1, parent2};
     }
 
 
-    private void removeCustomerIDsFromRoutes(List<List<List<Integer>>> routesAcrossAllDepots, List<Integer> IDs) {
-        for (List<List<Integer>> routes : routesAcrossAllDepots) {
-            for (List<Integer> route : routes) {
+    private void removeCustomerIDsFromRoutes(List<List<Route>> routesAcrossAllDepots, List<Integer> IDs) {
+        for (List<Route> routes : routesAcrossAllDepots) {
+            for (Route route : routes) {
                 for (int ID : IDs) {
-                    if (route.contains(ID)) {
-                        route.remove(Integer.valueOf(ID));
-                    }
+                    route.removeCustomer(ID);
                 }
             }
-            routes.removeIf(List::isEmpty);  // Remove empty routes
+            routes.removeIf(Route::isEmpty);  // Remove empty routes
         }
     }
 

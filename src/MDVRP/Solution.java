@@ -1,6 +1,7 @@
 package MDVRP;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import GA.Metrics;
 
 import java.util.ArrayList;
@@ -21,14 +22,14 @@ public class Solution {
         Map<Integer, List<Double>> routesDemand = new HashMap<>();
         Map<Integer, List<Double>> routesDistance = new HashMap<>();
 
-        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
             int depotID = entry.getKey();
             routesDemand.put(depotID, new ArrayList<>());
             routesDistance.put(depotID, new ArrayList<>());
-            List<List<Integer>> chromosomeDepot = entry.getValue();
-            for (List<Integer> route: chromosomeDepot) {
-                double routeDemand = metrics.getRouteDemand(route);
-                double routeDistance = metrics.getRouteDistance(depotID, route);
+            List<Route> chromosomeDepot = entry.getValue();
+            for (Route route: chromosomeDepot) {
+                double routeDemand = metrics.getRouteDemand(route.getRoute());
+                double routeDistance = metrics.getRouteDistance(depotID, route.getRoute());
 
                 routesDemand.get(depotID).add(routeDemand);
                 routesDistance.get(depotID).add(routeDistance);

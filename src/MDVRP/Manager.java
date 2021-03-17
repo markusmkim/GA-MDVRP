@@ -8,6 +8,7 @@ import java.lang.Math;
 import java.util.stream.Collectors;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import GA.Operations.Selection;
 import Utils.Euclidian;
 import Utils.Formatter;
@@ -148,6 +149,7 @@ public class Manager {
             for (Map.Entry<Integer, Double> entry : depotDistances.entrySet()) {
                 if ((entry.getValue() - shortestDistance) / shortestDistance < this.borderlineThreshold && entry.getKey() != currentShortestDepot.getId()) {
                     customer.addPossibleDepot(entry.getKey());
+                    customer.setOnBorderline();
                     isBorderlineCustomer = true;
                 }
             }
@@ -164,9 +166,9 @@ public class Manager {
     public List<CrowdedDepot> assignCustomerToDepotsFromIndividual(Individual individual) {
         List<CrowdedDepot> depots = this.copyDepots().stream().map(CrowdedDepot::new).collect(Collectors.toList());
         for (CrowdedDepot depot : depots) {
-            List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
-            for (List<Integer> route : routes) {
-                for (Integer customerId : route) {
+            List<Route> routes = individual.getChromosome().get(depot.getId());
+            for (Route route : routes) {
+                for (Integer customerId : route.getRoute()) {
                     Customer customer = this.getCustomer(customerId);
                     depot.addCustomer(customer);
                 }
@@ -189,21 +191,21 @@ public class Manager {
             // Write total solution cost (distance)
             filewriter.write("" + solution.getIndividual().getFitness());
 
-            for (Map.Entry<Integer, List<List<Integer>>> entry : solution.getIndividual().getChromosome().entrySet()) {
+            for (Map.Entry<Integer, List<Route>> entry : solution.getIndividual().getChromosome().entrySet()) {
                 int depotID = entry.getKey();
                 List<Double> routesDemand = solution.getRoutesDemand().get(depotID);
                 List<Double> routesDistance = solution.getRoutesDistance().get(depotID);
 
-                List<List<Integer>> depotRoutes = entry.getValue();
+                List<Route> depotRoutes = entry.getValue();
 
                 for (int i = 0; i < depotRoutes.size(); i++) {
-                    List<Integer> route = depotRoutes.get(i);
+                    Route route = depotRoutes.get(i);
                     double routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
                     int vehicleID = i + 1;
 
                     // Write output line to file
-                    filewriter.write("\n" + Formatter.formatOutputLine(depotID, vehicleID, routeDistance, routeDemand, route));
+                    filewriter.write("\n" + Formatter.formatOutputLine(depotID, vehicleID, routeDistance, routeDemand, route.getRoute()));
                 }
             }
 
