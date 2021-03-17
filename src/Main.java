@@ -20,7 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Manager manager = new Manager("data/problems/p20", 0.5);
+        Manager manager = new Manager("data/problems/p01", 0.5);
 
         Algorithm ga = new Algorithm(manager);
 
@@ -33,7 +33,7 @@ public class Main extends Application {
         System.out.println("\nTotal distance best solution: " + solutionCost);
 
         // Save solution to file
-        Manager.saveSolution(solution, "data/solutions/p20.res");
+        Manager.saveSolution(solution, "data/solutions/p01.res");
 
         // Prepare data for plotting
         this.scaleTransform(depots);
@@ -141,8 +141,6 @@ public class Main extends Application {
         double size = Integer.max(diffX, diffY);
 
         this.scalingFactor = 470 / size;
-
-        System.out.println(scalingFactor);
 
         // Transform all coordinates to positive axes
         if (minX < 0 || minY < 0) {

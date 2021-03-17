@@ -14,6 +14,7 @@ import Utils.Euclidian;
 import Utils.Formatter;
 
 
+
 public class Manager {
     private List<Customer> customers = new ArrayList<>();
     private List<Customer> swappableCustomers = new ArrayList<>();
@@ -189,18 +190,19 @@ public class Manager {
             filewriter = new FileWriter(file);
 
             // Write total solution cost (distance)
-            filewriter.write("" + solution.getIndividual().getFitness());
+            double distance = solution.getIndividual().getFitness();
+            filewriter.write("" + String.format(Locale.ROOT, "%.2f", distance));
 
             for (Map.Entry<Integer, List<Route>> entry : solution.getIndividual().getChromosome().entrySet()) {
                 int depotID = entry.getKey();
-                List<Double> routesDemand = solution.getRoutesDemand().get(depotID);
+                List<Integer> routesDemand = solution.getRoutesDemand().get(depotID);
                 List<Double> routesDistance = solution.getRoutesDistance().get(depotID);
 
                 List<Route> depotRoutes = entry.getValue();
 
                 for (int i = 0; i < depotRoutes.size(); i++) {
                     Route route = depotRoutes.get(i);
-                    double routeDemand = routesDemand.get(i);
+                    int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
                     int vehicleID = i + 1;
 

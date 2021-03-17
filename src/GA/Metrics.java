@@ -177,8 +177,8 @@ public class Metrics {
     }
 
 
-    public double getRouteDemand(List<Integer> route) {
-        double totalDemand = 0;
+    public int getRouteDemand(List<Integer> route) {
+        int totalDemand = 0;
         for (Integer customerId : route) {
             totalDemand += this.manager.getCustomer(customerId).getDemand();
         }
