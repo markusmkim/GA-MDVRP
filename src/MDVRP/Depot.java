@@ -33,6 +33,9 @@ public class Depot {
     public int getMaxVehicles()             { return this.maxVehicles; }
     public int getMaxVehicleLoad()          { return maxVehicleLoad; }
 
+    protected void setX(int x) { this.x = x; }
+    protected void setY(int y) { this.y = y; }
+
 
     public Depot getDepotCopy() {
         return new Depot(this.id, this.x, this.y, this.maxVehicles, this.maxDuration, this.getMaxVehicleLoad());

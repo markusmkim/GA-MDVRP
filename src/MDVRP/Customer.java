@@ -40,6 +40,9 @@ public class Customer {
     public boolean getOnBorder()                { return onBorderline; }
     public List<Integer> getPossibleDepots()    { return possibleDepotsIDs; }
 
+    public void setX(int x) { this.x = x; }
+    public void setY(int y) { this.y = y; }
+
     @Override
     public String toString() {
         // return customer id

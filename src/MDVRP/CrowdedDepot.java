@@ -17,6 +17,10 @@ public class CrowdedDepot extends Depot {
     }
 
 
+    public void setX(int x) { super.setX(x); }
+    public void setY(int y) { super.setY(y); }
+
+
     public List<Customer> getCustomers()    { return this.customers; }
 
     public Customer getCustomer(int id) {
