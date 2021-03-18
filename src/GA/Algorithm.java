@@ -16,6 +16,7 @@ public class Algorithm {
     private Mutation mutation;
     private int populationSize;
     private int numberOfGenerations;
+    private int refinementAfter;
     private double fitnessBias;
     private int eliteReplacement;
 
@@ -24,6 +25,7 @@ public class Algorithm {
         // ------------------- PARAMS -------------------- //
         int populationSize = 100;
         int numberOfGenerations = 1000;
+        int refinementAfter = 800;
         double fitnessBias = 0.8;
         double crossoverRate = 0.8;
         double mutationRate = 0.05;
@@ -33,6 +35,7 @@ public class Algorithm {
 
         this.populationSize = populationSize;
         this.numberOfGenerations = numberOfGenerations;
+        this.refinementAfter = refinementAfter;
         this.fitnessBias = fitnessBias;
         this.eliteReplacement = eliteReplacement;
         this.manager = manager;
@@ -137,6 +140,9 @@ public class Algorithm {
                 population = population.subList(0, population.size() - 21);
             }
              */
+            if (generation == this.refinementAfter) {
+                this.mutation.setRefinementPhase();
+            }
         }
 
 

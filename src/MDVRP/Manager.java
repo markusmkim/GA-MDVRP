@@ -204,6 +204,8 @@ public class Manager {
                     Route route = depotRoutes.get(i);
                     int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
+                    double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
+                    System.out.println(routeDistance == rr);
                     int vehicleID = i + 1;
 
                     // Write output line to file

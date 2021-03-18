@@ -15,6 +15,7 @@ public class Mutation {
     private Inserter inserter;
     private double mutationRate;
     private int interDepotFreq;
+    private boolean refinementPhase;
 
     public Mutation(Manager manager, Metrics metrics, Inserter inserter, double mutationRate, int interDepotFreq) {
         this.manager = manager;
@@ -22,6 +23,13 @@ public class Mutation {
         this.inserter = inserter;
         this.mutationRate = mutationRate;
         this.interDepotFreq = interDepotFreq;
+        this.refinementPhase = false;
+    }
+
+
+    public void setRefinementPhase() {
+        System.out.println("Setting mutation operator in refinement state");
+        this.refinementPhase = true;
     }
 
 
@@ -31,7 +39,12 @@ public class Mutation {
                 this.applyInterDepotSwapping(individual);
             }
             else {
-                this.applyReversal(individual);
+                if (this.refinementPhase) {
+                    this.applyRelocation(individual);
+                }
+                else {
+                    this.applyReversal(individual);
+                }
             }
         }
     }
@@ -93,6 +106,35 @@ public class Mutation {
 
         // apply mutation to chromosome
         individual.getChromosome().put(chosenDepotId, augmentedRoutes);
+    }
+
+
+    private void applyRelocation(Individual individual) {
+        Random random = new Random();
+        List<Integer> depotIDs = new ArrayList<>(individual.getChromosome().keySet());
+        int chosenDepotId = depotIDs.get(random.nextInt(depotIDs.size()));
+        List<Route> routes = individual.getChromosome().get(chosenDepotId);
+
+        // Pick random customer to relocate within same depot
+        List<Integer> candidates = new ArrayList<>();
+        for (Route route : routes) {
+            candidates.addAll(route.getRoute());
+        }
+        if (candidates.isEmpty()) {
+            return;
+        }
+        int chosenCustomerID = candidates.get(random.nextInt(candidates.size()));
+
+        // Remove customer
+        for (Route route : routes) {
+            if (route.removeCustomer(chosenCustomerID)) {
+                break;
+            }
+        }
+
+        // Insert customer
+        Depot chosenDepot = this.manager.getDepot(chosenDepotId);
+        this.inserter.insertCustomerID(chosenDepot, individual, chosenCustomerID, 1);
     }
 
 
