@@ -5,10 +5,14 @@ import GA.Components.Individual;
 import java.util.List;
 import java.util.Random;
 
-
+/*
+Class for selection operator: Selecting a parent to undergo reproduction.
+ */
 public class Selection {
-
     public static Individual[] selectCompetitorPair(List<Individual> population) {
+        /*
+        Selects two random individuals from population.
+         */
         Random random = new Random();
         Individual p1 = population.get(random.nextInt(population.size()));
         Individual p2 = population.get(random.nextInt(population.size()));
@@ -16,10 +20,12 @@ public class Selection {
     }
 
 
-    // Fitness bias = 0.8 in the paper
     public static Individual runTournamentSelection(Individual player1, Individual player2, double fitnessBias) {
-        Individual[] winners = new Individual[2];
-
+        /*
+        Runs tournament selection between two candidates.
+        Fitness bias controls how often the tournament is played out. If it is, best individuals wins.
+        If not, choose random individual.
+         */
         Individual chosenIndividual = player1;
         if (Math.random() < fitnessBias) {
             if (player2.getFitness() > player1.getFitness()) {

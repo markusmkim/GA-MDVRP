@@ -2,10 +2,14 @@ package GA.Components;
 
 import java.util.*;
 
-
+/*
+The members of the population.
+Represents a solution to the problem.
+In this case fitness = total distance travelled and should be minimized.
+ */
 public class Individual implements Comparable<Individual> {
     private double fitness;
-    private Map<Integer, List<Route>> chromosome;  // length = number of depots
+    private Map<Integer, List<Route>> chromosome;  // Map<DepotID, DepotRoutes>
     private boolean isFeasible;
 
 
@@ -13,9 +17,12 @@ public class Individual implements Comparable<Individual> {
         this.chromosome = initialChromosome;
     }
 
-    public void setIsFeasible(boolean feasible) { this.isFeasible = feasible; }
+    // Getters
     public boolean isFeasible()                 { return isFeasible; }
     public double getFitness()                  { return fitness; }
+
+    // Setters
+    public void setIsFeasible(boolean feasible) { this.isFeasible = feasible; }
     public void setFitness(double fitness) {
         if (fitness < 0) {
             System.out.println("Something wrong - negative fitness in Individual.setFitness");
@@ -46,8 +53,8 @@ public class Individual implements Comparable<Individual> {
 
 
     public Individual getClone() {
-        /**
-         * Clone individual without fitness and isFeasible
+        /*
+          Clone individual without fitness and isFeasible
          */
         Map<Integer, List<Route>> chromosomeCopy = new HashMap<>();
 

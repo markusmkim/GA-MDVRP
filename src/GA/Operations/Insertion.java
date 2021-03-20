@@ -8,13 +8,15 @@ import Utils.Euclidian;
 
 import java.util.List;
 
-
+/*
+Data wrapper class to represent a possible insertion of a customer into a route
+ */
 public class Insertion implements Comparable<Insertion> {
     private Manager manager;
     private Depot depot;
     private double cost;
     private boolean isFeasible;
-    private List<List<Integer>> result;
+    private List<List<Integer>> result;  // The result (all routes in depot) of this insertion
 
 
     public Insertion(Manager manager, Metrics metrics, Depot depot, List<List<Integer>> augmentedRoutes, int customerID, int routeLoc, int index) {
@@ -28,12 +30,19 @@ public class Insertion implements Comparable<Insertion> {
 
 
     private double insertionCost(List<List<Integer>> routes, int customerID, int routeLoc, int index) {
+        /*
+        Computes the insertion cost of the insertion, based on which route and location in said route insertion is applied
+         */
         List<Integer> augmentedRoute = routes.get(routeLoc);
         Customer customer = this.manager.getCustomer(customerID);
+
+        // If this insertion created a new route distance, the cost is simply twice the distance between depot and customer
         if (augmentedRoute.size() == 1) {
             return 2 * Euclidian.distance(new int[]{depot.getX(), depot.getY()}, new int[]{customer.getX(), customer.getY()});
         }
 
+        // If this insertion was at start or end of route,
+        // cost = distance from depot to customer and customer to old first/last customer minus distance from depot to old first/last customer
         if (index == 0 || index == augmentedRoute.size() - 1) {
             int offset = index == 0 ? 1 : -1;
             Customer otherCustomer = this.manager.getCustomer(augmentedRoute.get(index + offset));
@@ -43,6 +52,8 @@ public class Insertion implements Comparable<Insertion> {
             return distanceToDepot + distanceToOther - distanceDepotToOther;
         }
 
+        // Else insertion is at location between two customers, and
+        // cost = distance from customer to both other customers minus distance between both other customers
         Customer customerBefore = this.manager.getCustomer(augmentedRoute.get(index - 1));
         Customer customerAfter = this.manager.getCustomer(augmentedRoute.get(index + 1));
         double distanceToCustomerBefore = Euclidian.distance(new int[]{customer.getX(), customer.getY()}, new int[]{customerBefore.getX(), customerBefore.getY()});

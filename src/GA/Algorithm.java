@@ -24,16 +24,16 @@ public class Algorithm {
 
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
-        int populationSize = 60; // 100
-        int numberOfGenerations = 1400;
+        int populationSize = 80; // 100
+        int numberOfGenerations = 1200;
         double fitnessGoal = 4233;
-        int refinementAfter = 600; // 800
+        int refinementAfter = 700; // 800
         double fitnessBias = 0.8;
-        double crossoverRate = 0.8;
+        double crossoverRate = 0.8; // 0.8
         double crossoverFeasibleBalance = 1;
         double mutationRate = 0.05;
-        int eliteReplacement = 10; // 20
-        int interDepotMutationFreq = 10;
+        int eliteReplacement = 20; // 20
+        int interDepotMutationFreq = 10; // 10
         // ------------------------------------------------//
 
         this.populationSize = populationSize;

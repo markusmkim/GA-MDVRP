@@ -3,12 +3,13 @@ package GA.Components;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
+/*
+Represents a route from and to a particular depot.
+ */
 public class Route {
-    private List<Integer> route;
-    private int demand;
-    private double distance;
+    private List<Integer> route;    // List of customer IDs
+    private int demand;             // total demand of customers
+    private double distance;        // total route distance
 
     public Route(List<Integer> route, int demand, double distance) {
         this.route = route;

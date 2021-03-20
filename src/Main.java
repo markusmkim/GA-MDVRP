@@ -22,7 +22,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         String problem = "p09";
 
-        Manager manager = new Manager("data/problems/" + problem, 0.5);
+        Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
 
         Algorithm ga = new Algorithm(manager);
 
@@ -75,6 +75,7 @@ public class Main extends Application {
         // draw all customers belonging to depots
         for (Customer customer: depot.getCustomers()) {
             double size = 6;
+            // if (customer.getOnBorder()) { size = 10; }
             double xx = (customer.getX() * this.scalingFactor) - (size / 2);
             double yy = (customer.getY() * this.scalingFactor) - (size / 2);
             gc.fillOval(xx, yy, size, size);

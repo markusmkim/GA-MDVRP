@@ -10,10 +10,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
+/*
+Functional class to take care of the task to insert a customer into a route at best location.
+Uses Insertion as a data wrapper class to represent each possible insertion and its quality, then selects the best.
+ */
 public class Inserter {
     private Manager manager;
     private Metrics metrics;
+
 
     public Inserter(Manager manager, Metrics metrics) {
         this.manager = manager;
@@ -22,11 +26,13 @@ public class Inserter {
 
 
     public void insertCustomerID(Depot depot, Individual individual, int customerID, double balanceParameter) {
-        List<Insertion> feasibleInsertions = new ArrayList<>();
-        List<Insertion> unFeasibleInsertions = new ArrayList<>();
+        List<Insertion> feasibleInsertions = new ArrayList<>();             // Store all possible feasible solutions
+        List<Insertion> unFeasibleInsertions = new ArrayList<>();           // Store all possible non-feasible solutions
 
         List<Route> routes  = individual.getChromosome().get(depot.getId());
         int numberOfRoutes = 0;
+
+        // Try all possible insertions in existing routes in depot
         for (int routeLoc = 0; routeLoc < routes.size(); routeLoc++) {
             for (int index = 0; index < routes.get(routeLoc).getRoute().size() + 1; index ++) {
                 List<List<Integer>> routesCopy = Inserter.copyDepotRoutes(routes);
@@ -40,12 +46,13 @@ public class Inserter {
             }
             numberOfRoutes++;
         }
-        // System.out.println(numberOfRoutes + " : " + depot.getMaxVehicles());
+
+        // If depot can add a route and still satisfy constraints, suggest this as well
         if (numberOfRoutes < depot.getMaxVehicles()) {
             List<List<Integer>> routesCopy = Inserter.copyDepotRoutes(routes);
             List<Integer> newRoute = new ArrayList<>(Arrays.asList(customerID));
             routesCopy.add(newRoute);
-            // System.out.println(Arrays.toString(routesCopy.toArray()));
+
             Insertion insertion = new Insertion(this.manager, this.metrics, depot, routesCopy, customerID, routesCopy.size() - 1, 0);
             if (insertion.isFeasible()) {
                 feasibleInsertions.add(insertion);
@@ -56,21 +63,21 @@ public class Inserter {
 
 
         Insertion chosenInsertion;
-        if (Math.random() < balanceParameter && feasibleInsertions.size() > 0) {   // Find first feasible insertion
+        if (Math.random() < balanceParameter && feasibleInsertions.size() > 0) {        // Find best feasible insertion
             chosenInsertion = Insertion.findBest(feasibleInsertions);
         }
         else {
             List<Insertion> allInsertions = new ArrayList<>();
             allInsertions.addAll(feasibleInsertions);
             allInsertions.addAll(unFeasibleInsertions);
-            chosenInsertion = Insertion.findBest(allInsertions);                       // Else, take best infeasible
+            chosenInsertion = Insertion.findBest(allInsertions);                        // Else, take best infeasible
         }
 
         List<Route> result = this.getResult(chosenInsertion);
 
-        // insert
-        individual.getChromosome().put(chosenInsertion.getDepot().getId(), result);
+        individual.getChromosome().put(chosenInsertion.getDepot().getId(), result);     // Apply insertion
     }
+
 
     private List<Route> getResult(Insertion insertion) {
         List<Route> result = new ArrayList<>();
@@ -79,7 +86,6 @@ public class Inserter {
             this.metrics.evaluateRoute(insertion.getDepot().getId(), resultingRoute);
             result.add(resultingRoute);
         }
-
         return result;
     }
 

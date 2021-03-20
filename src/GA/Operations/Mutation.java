@@ -9,6 +9,11 @@ import MDVRP.Manager;
 
 import java.util.*;
 
+/*
+Mutation operator class.
+Applies two different intra-depot mutations (reversal and relocation)
+and one inter-depot mutation (swapping borderline customers between depots).
+ */
 public class Mutation {
     private Manager manager;
     private Metrics metrics;
@@ -16,6 +21,7 @@ public class Mutation {
     private double mutationRate;
     private int interDepotFreq;
     private boolean refinementPhase;
+
 
     public Mutation(Manager manager, Metrics metrics, Inserter inserter, double mutationRate, int interDepotFreq) {
         this.manager = manager;
@@ -34,16 +40,16 @@ public class Mutation {
 
 
     public void apply(Individual individual, int generation) {
-        if (Math.random() < mutationRate) {
-            if (generation % this.interDepotFreq == 0) {
-                this.applyInterDepotSwapping(individual);
+        if (Math.random() < mutationRate) {                                     // Apply mutation by probability //
+            if (generation > 100 && generation % this.interDepotFreq == 0) {    // Every 10th generation,
+                this.applyInterDepotSwapping(individual);                       // swap a customer between two depots
             }
-            else {
-                if (this.refinementPhase) {
-                    this.applyRelocation(individual);
+            else {                                                              // Every other generation:
+                if (this.refinementPhase) {                                     // If in refinement mode
+                    this.applyRelocation(individual);                           // apply relocation mutation
                 }
                 else {
-                    this.applyReversal(individual);
+                    this.applyReversal(individual);                             // Else, apply reversal mutation
                 }
             }
         }
@@ -51,6 +57,12 @@ public class Mutation {
 
 
     private void applyReversal(Individual individual) {
+        /*
+        Reversal mutation:
+        1. Choose random depot
+        2. Flatten routes in depot to get one array of customers
+        3. Select two random indexes and reverse all customers between indexes
+         */
         Random random = new Random();
         List<Integer> depotIDs = new ArrayList<>(individual.getChromosome().keySet());
         int chosenDepotId = depotIDs.get(random.nextInt(depotIDs.size()));
@@ -110,6 +122,11 @@ public class Mutation {
 
 
     private void applyRelocation(Individual individual) {
+        /*
+        Relocation mutation:
+        Step 1: Select a random customer
+        Step 2: Insert customer at best location in the same depot
+         */
         Random random = new Random();
         List<Integer> depotIDs = new ArrayList<>(individual.getChromosome().keySet());
         int chosenDepotId = depotIDs.get(random.nextInt(depotIDs.size()));
@@ -139,6 +156,12 @@ public class Mutation {
 
 
     private void applyInterDepotSwapping(Individual individual) {
+        /*
+        Inter-depot swapping mutation:
+        Step 1: Select one random borderline customer
+        Step 2: Swap customer to a randomly selected depot (from customer possible depots)
+        Step 3: Insert customer at best location in it's new depot
+         */
         Random random = new Random();
         List<Customer> candidates = this.manager.getSwappableCustomers();
         Customer chosenCustomer = candidates.get(random.nextInt(candidates.size()));  // choose random customer to swap
