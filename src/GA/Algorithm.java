@@ -16,6 +16,7 @@ public class Algorithm {
     private Mutation mutation;
     private int populationSize;
     private int numberOfGenerations;
+    private double fitnessGoal;
     private int refinementAfter;
     private double fitnessBias;
     private int eliteReplacement;
@@ -23,25 +24,28 @@ public class Algorithm {
 
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
-        int populationSize = 100;
-        int numberOfGenerations = 1000;
-        int refinementAfter = 800;
+        int populationSize = 60; // 100
+        int numberOfGenerations = 1400;
+        double fitnessGoal = 4233;
+        int refinementAfter = 600; // 800
         double fitnessBias = 0.8;
         double crossoverRate = 0.8;
+        double crossoverFeasibleBalance = 1;
         double mutationRate = 0.05;
-        int eliteReplacement = 20;
+        int eliteReplacement = 10; // 20
         int interDepotMutationFreq = 10;
         // ------------------------------------------------//
 
         this.populationSize = populationSize;
         this.numberOfGenerations = numberOfGenerations;
+        this.fitnessGoal = fitnessGoal;
         this.refinementAfter = refinementAfter;
         this.fitnessBias = fitnessBias;
         this.eliteReplacement = eliteReplacement;
         this.manager = manager;
         this.metrics = new Metrics(manager);
         Inserter inserter = new Inserter(manager, this.metrics);
-        this.crossover = new Crossover(manager, inserter, crossoverRate);
+        this.crossover = new Crossover(manager, inserter, crossoverRate, crossoverFeasibleBalance);
         this.mutation = new Mutation(manager, this.metrics, inserter, mutationRate, interDepotMutationFreq);
     }
 
@@ -134,19 +138,19 @@ public class Algorithm {
             this.evaluatePopulation(bestParents);
             this.evaluateFeasibility(bestParents);
 
-            /*
-            if (generation == this.numberOfGenerations / 2) {
-                System.out.println("Cutting population");
-                population = population.subList(0, population.size() - 21);
+            if (population.get(0).isFeasible() && population.get(0).getFitness() < this.fitnessGoal) {
+                System.out.println("Found sufficient solution --> stopping algorithm");
+                break;
             }
-             */
+
             if (generation == this.refinementAfter) {
                 this.mutation.setRefinementPhase();
+                this.crossover.setCrossoverRate(0.5);
             }
         }
 
 
-        this.evaluateFeasibility(population);
+        // this.evaluateFeasibility(population);
 
         // Sort last population
         Collections.sort(population);
@@ -173,17 +177,6 @@ public class Algorithm {
 
         System.out.println("Number of customers in solution: " + aa);
         return new Solution(solutionDepots, bestIndividual, this.metrics);
-    }
-
-
-    private void printCustomerInfo(Customer customer, int customerId) {
-        System.out.println("\nCustomer example: Customer " + customerId);
-        System.out.println("------------------------");
-        System.out.println("Id:                 " + customer.getId());
-        System.out.println("X coordinate:       " + customer.getX());
-        System.out.println("Y coordinate:       " + customer.getY());
-        System.out.println("Duration:           " + customer.getDuration());
-        System.out.println("Demand:             " + customer.getDemand());
     }
 
     private void printBorderCustomers() {
@@ -215,21 +208,6 @@ public class Algorithm {
         for (Individual individual : population) {
             boolean isFeasible = this.metrics.isIndividualFeasible(individual);
             individual.setIsFeasible(isFeasible);
-        }
-    }
-
-    private void printRouteDemands(Individual individual) {
-        System.out.println("Route demands");
-        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
-            int key = entry.getKey();
-            System.out.println("Depot " + key);
-            List<Route> chromosomeDepot = entry.getValue();
-            int routeIndex = 1;
-            for (Route route: chromosomeDepot) {
-                int demand = route.getDemand();
-                System.out.println("Route " + routeIndex + ": " + demand);
-                routeIndex++;
-            }
         }
     }
 }

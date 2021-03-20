@@ -14,13 +14,17 @@ public class Crossover {
     private Inserter inserter;
 
 
-    public Crossover(Manager manager, Inserter inserter, double crossoverRate) {
+    public Crossover(Manager manager, Inserter inserter, double crossoverRate, double balanceParameter) {
         this.crossoverRate = crossoverRate;
-        this.balanceParameter = 1;
+        this.balanceParameter = balanceParameter;
         this.manager = manager;
         this.inserter = inserter;
     }
 
+    public void setCrossoverRate(double crossoverRate) {
+        System.out.println("Lowering crossover rate to " + crossoverRate);
+        this.crossoverRate = crossoverRate;
+    }
 
     public Individual[] apply(Individual p1, Individual p2) {
         if (Math.random() > this.crossoverRate) {

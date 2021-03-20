@@ -4,11 +4,10 @@ import GA.Metrics;
 import MDVRP.Customer;
 import MDVRP.Depot;
 import MDVRP.Manager;
-import MDVRP.RouteScheduler;
 import Utils.Euclidian;
 
-import java.util.Arrays;
 import java.util.List;
+
 
 public class Insertion implements Comparable<Insertion> {
     private Manager manager;
@@ -24,7 +23,6 @@ public class Insertion implements Comparable<Insertion> {
 
         this.cost = this.insertionCost(augmentedRoutes, customerID, routeLoc, index);
         this.isFeasible = metrics.checkRoutes(depot, augmentedRoutes.get(routeLoc));
-
         this.result = augmentedRoutes;
     }
 
@@ -36,7 +34,7 @@ public class Insertion implements Comparable<Insertion> {
             return 2 * Euclidian.distance(new int[]{depot.getX(), depot.getY()}, new int[]{customer.getX(), customer.getY()});
         }
 
-        if (index == 0 || index == augmentedRoute.size() - 1) { //SJekk om -1 kan fjernes
+        if (index == 0 || index == augmentedRoute.size() - 1) {
             int offset = index == 0 ? 1 : -1;
             Customer otherCustomer = this.manager.getCustomer(augmentedRoute.get(index + offset));
             double distanceToDepot = Euclidian.distance(new int[]{depot.getX(), depot.getY()}, new int[]{customer.getX(), customer.getY()});

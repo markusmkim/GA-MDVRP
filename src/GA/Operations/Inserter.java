@@ -79,6 +79,7 @@ public class Inserter {
             this.metrics.evaluateRoute(insertion.getDepot().getId(), resultingRoute);
             result.add(resultingRoute);
         }
+
         return result;
     }
 

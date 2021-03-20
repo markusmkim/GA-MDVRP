@@ -16,11 +16,13 @@ import java.util.Random;
 
 
 public class Main extends Application {
-    private double scalingFactor = 5;
+    private double scalingFactor;
 
     @Override
     public void start(Stage stage) {
-        Manager manager = new Manager("data/problems/p20", 0.5);
+        String problem = "p09";
+
+        Manager manager = new Manager("data/problems/" + problem, 0.5);
 
         Algorithm ga = new Algorithm(manager);
 
@@ -33,7 +35,7 @@ public class Main extends Application {
         System.out.println("\nTotal distance best solution: " + solutionCost);
 
         // Save solution to file
-        Manager.saveSolution(solution, "data/solutions/p20.res");
+        Manager.saveSolution(solution, "data/solutions/" + problem + ".res");
 
         // Prepare data for plotting
         this.scaleTransform(depots);
@@ -89,7 +91,7 @@ public class Main extends Application {
                 Color.CYAN,
                 Color.DARKGOLDENROD,
                 Color.DARKMAGENTA,
-                Color.CHARTREUSE,
+                Color.BLUEVIOLET,
                 Color.CRIMSON,
                 Color.DEEPPINK,
                 Color.DARKORANGE,
