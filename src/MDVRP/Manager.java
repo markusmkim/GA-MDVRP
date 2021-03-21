@@ -13,8 +13,14 @@ import GA.Operations.Selection;
 import Utils.Euclidian;
 import Utils.Formatter;
 
-
-
+/*
+Class managing problem instance
+- Read problem from file
+- Initialize problem instances (customers and depots)
+- Assign customers to closest depot as an initial assignment (creates crowded depots)
+- Assign customers to correct depot according the chromosome of an individual (creates crowded depots)
+- Write solution to file
+ */
 public class Manager {
     private List<Customer> customers = new ArrayList<>();
     private List<Customer> swappableCustomers = new ArrayList<>();
@@ -24,8 +30,7 @@ public class Manager {
 
     public Manager(String problemFilepath, double borderlineThreshold) {
         this.borderlineThreshold = borderlineThreshold;
-        // read data and initialize customers and depots
-        this.readData(problemFilepath);
+        this.readData(problemFilepath);                             // read data and initialize customers and depots
     }
 
 
@@ -175,12 +180,14 @@ public class Manager {
                 }
             }
         }
-
         return depots;
     }
 
 
     public static void saveSolution(Solution solution, String outputPath) {
+        /*
+        Writes solution to file
+         */
         File file;
         FileWriter filewriter = null;
 
@@ -204,8 +211,8 @@ public class Manager {
                     Route route = depotRoutes.get(i);
                     int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
-                    double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
-                    System.out.println(routeDistance == rr);
+                    //double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
+                    // System.out.println(routeDistance == rr);
                     int vehicleID = i + 1;
 
                     // Write output line to file
@@ -229,7 +236,5 @@ public class Manager {
             }
         }
     }
-
-
 
 }

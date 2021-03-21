@@ -9,11 +9,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/*
+Data wrapper class to represent a solution to the problem
+ */
 public class Solution {
     private List<CrowdedDepot> depots;
     private Individual individual;
     private Map<Integer, List<Integer>> routesDemand;
     private Map<Integer, List<Double>> routesDistance;
+
 
     public Solution(List<CrowdedDepot> depots, Individual individual, Metrics metrics) {
         this.depots = depots;

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/*
+A depot with assigned customers
+ */
 public class CrowdedDepot extends Depot {
     private List<Customer> customers = new ArrayList<>();
 
@@ -17,10 +20,7 @@ public class CrowdedDepot extends Depot {
     }
 
 
-    public void setX(int x) { super.setX(x); }
-    public void setY(int y) { super.setY(y); }
-
-
+    // Getters //
     public List<Customer> getCustomers()    { return this.customers; }
 
     public Customer getCustomer(int id) {
@@ -31,6 +31,12 @@ public class CrowdedDepot extends Depot {
         String customerIds = Arrays.toString(this.customers.toArray());
         return "Depot " + this.getId() + " has customers: " + customerIds;
     }
+
+
+    // Setters //
+    public void setX(int x) { super.setX(x); }  // Used to shift coordinates before plotting
+    public void setY(int y) { super.setY(y); }
+
 
     public void addCustomer(Customer customer) {
         this.customers.add(customer);

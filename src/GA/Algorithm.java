@@ -1,7 +1,6 @@
 package GA;
 
 import GA.Components.Individual;
-import GA.Components.Route;
 import GA.Operations.*;
 import MDVRP.*;
 
@@ -18,18 +17,20 @@ public class Algorithm {
     private int numberOfGenerations;
     private double fitnessGoal;
     private int refinementAfter;
+    private double crossoverRateRefinementMode;
     private double fitnessBias;
     private int eliteReplacement;
 
 
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
-        int populationSize = 80; // 100
-        int numberOfGenerations = 1200;
-        double fitnessGoal = 4233;
-        int refinementAfter = 700; // 800
+        int populationSize = 100; // 80 - 100
+        int numberOfGenerations = 1400;
+        double fitnessGoal = 0;
+        int refinementAfter = 800; // 800, 600 - 800
         double fitnessBias = 0.8;
-        double crossoverRate = 0.8; // 0.8
+        double crossoverRate = 0.8; // 0.6 - 0.8
+        double crossoverRateRefinementMode = 0.4;
         double crossoverFeasibleBalance = 1;
         double mutationRate = 0.05;
         int eliteReplacement = 20; // 20
@@ -40,6 +41,7 @@ public class Algorithm {
         this.numberOfGenerations = numberOfGenerations;
         this.fitnessGoal = fitnessGoal;
         this.refinementAfter = refinementAfter;
+        this.crossoverRateRefinementMode = crossoverRateRefinementMode;
         this.fitnessBias = fitnessBias;
         this.eliteReplacement = eliteReplacement;
         this.manager = manager;
@@ -61,15 +63,14 @@ public class Algorithm {
 
         System.out.println("------------------------");
         for (CrowdedDepot depot: crowdedDepots) {
-            System.out.println(depot.getCustomerIds());
+            System.out.println("Depot " + depot.getId() + " has " + depot.getCustomers().size() + " customers");
         }
 
-        System.out.println("borderline customers");
-        this.printBorderCustomers();
+        // this.printBorderCustomers();
 
         // Initialize population
         List<Individual> population = Initializer.init(this.populationSize, crowdedDepots, this.metrics);
-        System.out.println("Initial population size: " + population.size());
+        System.out.println("\nInitial population size: " + population.size());
 
 
         // Evaluate fitness
@@ -110,8 +111,6 @@ public class Algorithm {
                 // add offspring pair to offspring
                 Collections.addAll(offspring, offspringPair);
 
-                // Elite replacement ??
-
             }
             averageDistance = this.evaluatePopulation(offspring);
             population = offspring;
@@ -145,12 +144,10 @@ public class Algorithm {
 
             if (generation == this.refinementAfter) {
                 this.mutation.setRefinementPhase();
-                this.crossover.setCrossoverRate(0.5);
+                this.crossover.setCrossoverRate(this.crossoverRateRefinementMode);
             }
         }
 
-
-        // this.evaluateFeasibility(population);
 
         // Sort last population
         Collections.sort(population);
@@ -166,18 +163,14 @@ public class Algorithm {
         System.out.println(bestIndividual);
 
         List<CrowdedDepot> solutionDepots = this.manager.assignCustomerToDepotsFromIndividual(bestIndividual);
-        int aa = 0;
+
         for (CrowdedDepot depot: solutionDepots) {
             System.out.println(depot.getCustomerIds());
-            aa += depot.getCustomers().size();
         }
 
-        System.out.println("Total distance old metric");
-        System.out.println(this.metrics.getTotalDistanceOLD(bestIndividual));
-
-        System.out.println("Number of customers in solution: " + aa);
         return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
+
 
     private void printBorderCustomers() {
         List<Integer> borderLineCustomerIds = new ArrayList<>();
@@ -188,6 +181,7 @@ public class Algorithm {
         System.out.println("\nCustomers on borderline:");
         System.out.println(borderLineCustomerIdsString);
     }
+
 
     private double evaluatePopulation(List<Individual> population) {
         double totalDistanceForPop = 0;
@@ -203,6 +197,7 @@ public class Algorithm {
         }
         return totalDistanceForPop / population.size();
     }
+
 
     private void evaluateFeasibility(List<Individual> population) {
         for (Individual individual : population) {

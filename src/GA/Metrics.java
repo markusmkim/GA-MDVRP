@@ -10,34 +10,15 @@ import Utils.Euclidian;
 import java.util.List;
 import java.util.Map;
 
+
+/*
+Class to measure the individuals in terms of the problem domain
+ */
 public class Metrics {
     private Manager manager;
 
     public Metrics(Manager manager) {
         this.manager = manager;
-    }
-
-    // FITNESS FUNCTION
-    public double getTotalDistanceOLD(Individual individual) {
-        List<Depot> depots = this.manager.getDepots();
-        double totalDistance = 0;
-        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
-            int key = entry.getKey();
-            List<Route> chromosomeDepot = entry.getValue();
-            for (Route route : chromosomeDepot) {
-                Depot depot = depots.stream().filter(d -> key == d.getId()).findAny().orElse(null);// find depot
-                if (depot == null) {
-                    System.out.println("Something wring, depot = null in Metrics.getTotalDistance");
-                    depot = depots.get(0);
-                }
-                totalDistance += this.getRouteDistance(depot.getId(), route.getRoute());                                 // get distance
-
-                // Print route demand
-                // double routeDemand = this.getRouteDemand(route);
-                //System.out.println("Route demand:  " + routeDemand);
-            }
-        }
-        return totalDistance;
     }
 
 
@@ -54,6 +35,10 @@ public class Metrics {
 
 
     public void evaluateRoute(int depotID, Route route) {
+        /*
+        Iterates through a route and calculates total demand and distance.
+        Assigns these values to the route object.
+         */
         if (route.getRoute().size() == 0) {
             return;
         }
@@ -87,6 +72,7 @@ public class Metrics {
         // Add distance from last customer and back to depot
         totalDistance += Euclidian.distance(toCustomerCoordinates, depotCoordinates);
 
+        // Assign values to route
         route.setDistance(totalDistance);
         route.setDemand(totalDemand);
     }
@@ -94,11 +80,9 @@ public class Metrics {
 
     public double getRouteDistance(int depotID, List<Integer> route) {
         if (route.size() == 0) {
-            // System.out.println("Empty route");
             return 0;
         }
 
-        // System.out.println("\nCalculation new route \n----------------------------------");
         double totalDistance = 0;
 
         Depot depot = this.manager.getDepot(depotID);
@@ -108,7 +92,6 @@ public class Metrics {
         Customer toCustomer = this.manager.getCustomer(route.get(0));
         int[] toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
         totalDistance += Euclidian.distance(depotCoordinates, toCustomerCoordinates);
-        //// System.out.println("Adding distance from " + Arrays.toString(depotCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
 
 
         // Add distances between customers
@@ -120,16 +103,13 @@ public class Metrics {
             toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
 
             totalDistance += Euclidian.distance(fromCustomerCoordinates, toCustomerCoordinates);
-            //// System.out.println("Adding distance from " + Arrays.toString(fromCustomerCoordinates) + " to " + Arrays.toString(toCustomerCoordinates));
 
             fromCustomer = toCustomer;
         }
 
         // Add distance from last customer and back to depot
         totalDistance += Euclidian.distance(toCustomerCoordinates, depotCoordinates);
-        //// System.out.println("Adding distance from " + Arrays.toString(toCustomerCoordinates) + " to " + Arrays.toString(depotCoordinates));
-        //System.out.println("=");
-        //System.out.println("Route distance: " + totalDistance);
+
         return totalDistance;
     }
 
@@ -149,6 +129,10 @@ public class Metrics {
 
 
     public boolean areRoutesFeasible(Depot depot, List<Route> routes) {
+        /*
+        Checks if the routes belonging to a particular depot are feasible.
+        Assumes all routes have updated demands and distances.
+         */
         int numberOfVehiclesInUse = 0;
         for (Route route : routes) {
             int demand = route.getDemand();
@@ -166,6 +150,10 @@ public class Metrics {
 
 
     public boolean checkRoutes(Depot depot, List<Integer> route) {
+        /*
+        Checks if given route within a depot is feasible.
+        Iterates through customers to calculate values.
+         */
         int demand = 0;
         for (int customerID : route) {
             Customer customer = this.manager.getCustomer(customerID);
@@ -185,3 +173,30 @@ public class Metrics {
         return totalDemand;
     }
 }
+
+
+
+/*
+// OLD FITNESS FUNCTION
+    public double getTotalDistanceOLD(Individual individual) {
+        List<Depot> depots = this.manager.getDepots();
+        double totalDistance = 0;
+        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
+            int key = entry.getKey();
+            List<Route> chromosomeDepot = entry.getValue();
+            for (Route route : chromosomeDepot) {
+                Depot depot = depots.stream().filter(d -> key == d.getId()).findAny().orElse(null);// find depot
+                if (depot == null) {
+                    System.out.println("Something wring, depot = null in Metrics.getTotalDistance");
+                    depot = depots.get(0);
+                }
+                totalDistance += this.getRouteDistance(depot.getId(), route.getRoute());                                 // get distance
+
+                // Print route demand
+                // double routeDemand = this.getRouteDemand(route);
+                //System.out.println("Route demand:  " + routeDemand);
+            }
+        }
+        return totalDistance;
+    }
+ */
