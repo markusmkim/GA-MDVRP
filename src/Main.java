@@ -20,7 +20,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        String problem = "p23";
+        String problem = "3";
 
         Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
 

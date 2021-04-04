@@ -25,9 +25,9 @@ public class Algorithm {
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
         int populationSize = 100; // 80 - 100
-        int numberOfGenerations = 1400;
-        double fitnessGoal = 0;
-        int refinementAfter = 800; // 800, 600 - 800
+        int numberOfGenerations = 400;
+        double fitnessGoal = 6397;
+        int refinementAfter = 600; // 800, 600 - 800
         double fitnessBias = 0.8;
         double crossoverRate = 0.8; // 0.6 - 0.8
         double crossoverRateRefinementMode = 0.4;

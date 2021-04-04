@@ -47,6 +47,6 @@ public class Solution {
     // Getters
     public Individual getIndividual()                       { return individual; }
     public List<CrowdedDepot> getDepots()                   { return depots; }
-    public Map<Integer, List<Integer>> getRoutesDemand()     { return routesDemand; }
+    public Map<Integer, List<Integer>> getRoutesDemand()    { return routesDemand; }
     public Map<Integer, List<Double>> getRoutesDistance()   { return routesDistance; }
 }
