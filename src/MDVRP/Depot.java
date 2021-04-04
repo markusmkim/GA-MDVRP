@@ -1,10 +1,9 @@
 package MDVRP;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 
-
+/*
+Represents a depot in the problem domain. Superclass for CrowdedDepot.
+ */
 public class Depot {
     private int id;
     private int x;
@@ -12,7 +11,6 @@ public class Depot {
     private int maxVehicles;
     private int maxDuration;
     private int maxVehicleLoad;  // Capacity
-    // private List<Customer> customers = new ArrayList<>();
 
 
     public Depot(Integer id, Integer x, Integer y, Integer maxVehicles, Integer maxDuration, Integer maxVehicleLoad) {
@@ -24,8 +22,7 @@ public class Depot {
         this.maxVehicleLoad = maxVehicleLoad;
     }
 
-
-
+    // Getters //
     public int getId()                      { return this.id; }
     public int getX()                       { return this.x; }
     public int getY()                       { return this.y; }
@@ -33,10 +30,15 @@ public class Depot {
     public int getMaxVehicles()             { return this.maxVehicles; }
     public int getMaxVehicleLoad()          { return maxVehicleLoad; }
 
+    // Setters //
+    protected void setX(int x) { this.x = x; }
+    protected void setY(int y) { this.y = y; }
+
 
     public Depot getDepotCopy() {
         return new Depot(this.id, this.x, this.y, this.maxVehicles, this.maxDuration, this.getMaxVehicleLoad());
     }
+
 
     @Override
     public String toString() {

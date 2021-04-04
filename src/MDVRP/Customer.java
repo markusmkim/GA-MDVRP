@@ -1,10 +1,12 @@
 package MDVRP;
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+
+/*
+Represents a customer in the problem domain
+ */
 public class Customer {
     private int id;
     private int x;
@@ -17,17 +19,19 @@ public class Customer {
 
     public Customer(Integer id, Integer x, Integer y, Integer duration, Integer demand) {
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.duration = duration;
-        this.demand = demand;
+        this.x = x;                     // x coordinate
+        this.y = y;                     // y coordinate
+        this.duration = duration;       // service duration
+        this.demand = demand;           // service demand
     }
 
     public void addPossibleDepot(int possibleDepotsID) {
+        this.possibleDepotsIDs.add(possibleDepotsID);
+    }
+    public void setOnBorderline() {
         if (! this.onBorderline) {
             this.onBorderline = true;
         }
-        this.possibleDepotsIDs.add(possibleDepotsID);
     }
 
     public int getId()                          { return id; }
@@ -37,6 +41,9 @@ public class Customer {
     public int getDemand()                      { return demand; }
     public boolean getOnBorder()                { return onBorderline; }
     public List<Integer> getPossibleDepots()    { return possibleDepotsIDs; }
+
+    public void setX(int x) { this.x = x; }  // Used to shift coordinates before plotting
+    public void setY(int y) { this.y = y; }
 
     @Override
     public String toString() {

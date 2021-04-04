@@ -1,11 +1,16 @@
 package GA.Operations;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import MDVRP.Depot;
 import MDVRP.Manager;
 
 import java.util.*;
 
+
+/*
+Recombination operator
+ */
 public class Crossover {
     private double crossoverRate;
     private double balanceParameter;
@@ -13,64 +18,62 @@ public class Crossover {
     private Inserter inserter;
 
 
-    public Crossover(Manager manager, Inserter inserter, double crossoverRate) {
+    public Crossover(Manager manager, Inserter inserter, double crossoverRate, double balanceParameter) {
         this.crossoverRate = crossoverRate;
-        this.balanceParameter = 0.8;
+        this.balanceParameter = balanceParameter;
         this.manager = manager;
         this.inserter = inserter;
     }
 
 
+    public void setCrossoverRate(double crossoverRate) {
+        System.out.println("Lowering crossover rate to " + crossoverRate);
+        this.crossoverRate = crossoverRate;
+    }
+
+
     public Individual[] apply(Individual p1, Individual p2) {
+        /*
+        Recombines two individuals (parents) to produce two new individuals (offspring),
+        by applying Best Cost Route Crossover:
+        1. Randomly select depot to undergo reproduction
+        2. Randomly select a route from each parent
+        3. For each selected route, remove all customers in that route from the other parent
+        4. For each customer c that was removed from parent p, insert customer c back in parent p at best location.
+         */
         if (Math.random() > this.crossoverRate) {
-            // By some probability according to the crossover rate parameter, do not d apply crossover
+            // By some probability according to the crossover rate parameter, do not apply crossover
             return new Individual[]{p1, p2};
         }
-        List<Depot> depots = this.manager.getDepots();
 
-        // Chose random depot to apply crossover to
+        // Step 1: Randomly select depot to undergo reproduction //
+        List<Depot> depots = this.manager.getDepots();
         Random random = new Random();
         List<Integer> depotIDs = new ArrayList<>(p1.getChromosome().keySet());
         int chosenDepotId = depotIDs.get(random.nextInt(depotIDs.size()));
         Depot chosenDepot = depots.stream().filter(d -> chosenDepotId == d.getId()).findAny().orElse(null);
 
-        // Copy parents to avoid cross reference bugs
-        Individual parent1 = p1.getCopy();
-        Individual parent2 = p2.getCopy();
+        Individual parent1 = p1.getClone();  // Clone parents to avoid cross reference bugs
+        Individual parent2 = p2.getClone();
 
-        // Choose random routes
+        // Step 2. Randomly select a route from each parent //
         List<Integer> parent1RandomRoute = new ArrayList<>(parent1.
                 getChromosome().
                 get(chosenDepotId).
-                get(random.nextInt(parent1.getChromosome().get(chosenDepotId).size())));
+                get(random.nextInt(parent1.getChromosome().get(chosenDepotId).size())).getRoute());
 
         List<Integer> parent2RandomRoute = new ArrayList<>(parent2.
                 getChromosome().
                 get(chosenDepotId).
-                get(random.nextInt(parent2.getChromosome().get(chosenDepotId).size())));
-
-        /*
-        System.out.println("\n----------------------------------------------------------------------------------------\n");
-        System.out.println("Before");
-        System.out.println(parent1);
-        System.out.println(parent2);
-
-        System.out.println("Choosing route " + Arrays.toString(parent1RandomRoute.toArray()) + "from parent 1");
-        System.out.println("Choosing route " + Arrays.toString(parent2RandomRoute.toArray()) + "from parent 2");
-         */
+                get(random.nextInt(parent2.getChromosome().get(chosenDepotId).size())).getRoute());
 
 
-        // Remove customers in parent 1 random route from parent 2, and vice versa
+
+        // Step 3: For each selected route, remove all customers in that route from the other parent //
         this.removeCustomerIDsFromRoutes(new ArrayList<>(parent2.getChromosome().values()), parent1RandomRoute);
         this.removeCustomerIDsFromRoutes(new ArrayList<>(parent1.getChromosome().values()), parent2RandomRoute);
 
-        /*
-        System.out.println("After removing");
-        System.out.println(parent1);
-        System.out.println(parent2);
-         */
-
-        // for (List<List<Integer>> routes : parentCopy1.getChromosome().get(chosenDepotId))
+        // Step 4: For each customer c that was removed from parent p, insert customer c in parent p at best location.
         for (Integer customerID : parent1RandomRoute) {
             // add all ids somewhere in parentCopy2
             this.inserter.insertCustomerID(chosenDepot, parent2, customerID, this.balanceParameter);
@@ -80,28 +83,19 @@ public class Crossover {
             // add all ids somewhere in parentCopy1
             this.inserter.insertCustomerID(chosenDepot, parent1, customerID, this.balanceParameter);
         }
-        /*
-        System.out.println("After insertion");
-        System.out.println(parent1);
-        System.out.println(parent2);
-        System.out.println("\n----------------------------------------------------------------------------------------\n");
-
-         */
 
         return new Individual[]{parent1, parent2};
     }
 
 
-    private void removeCustomerIDsFromRoutes(List<List<List<Integer>>> routesAcrossAllDepots, List<Integer> IDs) {
-        for (List<List<Integer>> routes : routesAcrossAllDepots) {
-            for (List<Integer> route : routes) {
+    private void removeCustomerIDsFromRoutes(List<List<Route>> routesAcrossAllDepots, List<Integer> IDs) {
+        for (List<Route> routes : routesAcrossAllDepots) {
+            for (Route route : routes) {
                 for (int ID : IDs) {
-                    if (route.contains(ID)) {
-                        route.remove(Integer.valueOf(ID));
-                    }
+                    route.removeCustomer(ID);
                 }
             }
-            routes.removeIf(List::isEmpty);  // Remove empty routes
+            routes.removeIf(Route::isEmpty);  // Remove empty routes
         }
     }
 
@@ -113,51 +107,4 @@ public class Crossover {
         }
         System.out.println(s);
     }
-
-
-    public static void main(String[] args) {
-        List<Integer> route1 = new ArrayList<>(Arrays.asList(5, 3, 2, 4, 1));
-        List<Integer> route2 = new ArrayList<>(Arrays.asList(7, 11, 9, 10, 8, 12));
-        List<List<Integer>> routes = new ArrayList<>();
-        List<List<List<Integer>>> rr = new ArrayList<>();
-
-        routes.add(route1);
-        routes.add(route2);
-        rr.add(routes);
-
-        System.out.println("Before");
-        Crossover.printRoutes(routes);
-
-        List<Integer> IDsToRemove = new ArrayList<>(Arrays.asList(3, 5, 11));
-        //Crossover crossover = new Crossover();
-        //crossover.removeCustomerIDsFromRoutes(rr, IDsToRemove);
-        //System.out.println("Removing keys 3, 5, and 11...");
-        //System.out.println("After");
-        //Crossover.printRoutes(routes);
-    }
-
-    /*
-    private void insertCustomerID(List<Depot> depots, Individual individual, int customerID) {
-        List<Insertion> insertions = new ArrayList<>();
-        for (Depot depot : depots) {
-            List<List<Integer>> routes  = individual.getChromosome().get(depot.getId());
-            int numberOfRoutes = 0;
-            for (int routeLoc = 0; routeLoc < routes.size(); routeLoc++) {
-                for (int index = 0; index < routes.get(routeLoc).size(); index ++) {
-                    List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
-                    routesCopy.get(routeLoc).add(index, customerID);
-                    Insertion insertion = new Insertion(this.manager, this.metrics, depot, routes, routesCopy);
-                    insertions.add(insertion);
-                }
-                numberOfRoutes++;
-            }
-            if (numberOfRoutes < depot.getMaxVehicles()) {
-                List<List<Integer>> routesCopy = Crossover.copyDepotRoutes(routes);
-                List<Integer> newRoute = new ArrayList<>(Arrays.asList(customerID));
-                routesCopy.add(newRoute);
-                Insertion insertion = new Insertion(this.manager, this.metrics, depot, routes, routesCopy);
-                insertions.add(insertion);
-            }
-        }
-     */
 }

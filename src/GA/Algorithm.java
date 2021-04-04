@@ -15,30 +15,40 @@ public class Algorithm {
     private Mutation mutation;
     private int populationSize;
     private int numberOfGenerations;
+    private double fitnessGoal;
+    private int refinementAfter;
+    private double crossoverRateRefinementMode;
     private double fitnessBias;
     private int eliteReplacement;
 
 
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
-        int populationSize = 100;
-        int numberOfGenerations = 600;
+        int populationSize = 100; // 80 - 100
+        int numberOfGenerations = 400;
+        double fitnessGoal = 6397;
+        int refinementAfter = 600; // 800, 600 - 800
         double fitnessBias = 0.8;
-        double crossoverRate = 0.8;
+        double crossoverRate = 0.8; // 0.6 - 0.8
+        double crossoverRateRefinementMode = 0.4;
+        double crossoverFeasibleBalance = 1;
         double mutationRate = 0.05;
-        int eliteReplacement = 20;
-        int interDepotMutationFreq = 10;
+        int eliteReplacement = 20; // 20
+        int interDepotMutationFreq = 10; // 10
         // ------------------------------------------------//
 
         this.populationSize = populationSize;
         this.numberOfGenerations = numberOfGenerations;
+        this.fitnessGoal = fitnessGoal;
+        this.refinementAfter = refinementAfter;
+        this.crossoverRateRefinementMode = crossoverRateRefinementMode;
         this.fitnessBias = fitnessBias;
         this.eliteReplacement = eliteReplacement;
         this.manager = manager;
         this.metrics = new Metrics(manager);
         Inserter inserter = new Inserter(manager, this.metrics);
-        this.crossover = new Crossover(manager, inserter, crossoverRate);
-        this.mutation = new Mutation(manager, inserter, mutationRate, interDepotMutationFreq);
+        this.crossover = new Crossover(manager, inserter, crossoverRate, crossoverFeasibleBalance);
+        this.mutation = new Mutation(manager, this.metrics, inserter, mutationRate, interDepotMutationFreq);
     }
 
 
@@ -53,15 +63,14 @@ public class Algorithm {
 
         System.out.println("------------------------");
         for (CrowdedDepot depot: crowdedDepots) {
-            System.out.println(depot.getCustomerIds());
+            System.out.println("Depot " + depot.getId() + " has " + depot.getCustomers().size() + " customers");
         }
 
-        System.out.println("borderline customers");
-        this.printBorderCustomers();
+        // this.printBorderCustomers();
 
         // Initialize population
-        List<Individual> population = Initializer.init(this.populationSize, crowdedDepots);
-        System.out.println("Initial population size: " + population.size());
+        List<Individual> population = Initializer.init(this.populationSize, crowdedDepots, this.metrics);
+        System.out.println("\nInitial population size: " + population.size());
 
 
         // Evaluate fitness
@@ -73,7 +82,7 @@ public class Algorithm {
         Collections.sort(population);
         List<Individual> bestParents = new ArrayList<>();
         for (int i = 0; i < this.eliteReplacement; i++) {
-            bestParents.add(population.get(i).getCopy());
+            bestParents.add(population.get(i).getClone());
         }
         this.evaluatePopulation(bestParents);
         this.evaluateFeasibility(bestParents);
@@ -102,8 +111,6 @@ public class Algorithm {
                 // add offspring pair to offspring
                 Collections.addAll(offspring, offspringPair);
 
-                // Elite replacement ??
-
             }
             averageDistance = this.evaluatePopulation(offspring);
             population = offspring;
@@ -125,21 +132,22 @@ public class Algorithm {
             }
             bestParents = new ArrayList<>();
             for (int i = 0; i < this.eliteReplacement; i++) {
-                bestParents.add(population.get(i).getCopy());
+                bestParents.add(population.get(i).getClone());
             }
             this.evaluatePopulation(bestParents);
             this.evaluateFeasibility(bestParents);
 
-            /*
-            if (generation == this.numberOfGenerations / 2) {
-                System.out.println("Cutting population");
-                population = population.subList(0, population.size() - 21);
+            if (population.get(0).isFeasible() && population.get(0).getFitness() < this.fitnessGoal) {
+                System.out.println("Found sufficient solution --> stopping algorithm");
+                break;
             }
-             */
+
+            if (generation == this.refinementAfter) {
+                this.mutation.setRefinementPhase();
+                this.crossover.setCrossoverRate(this.crossoverRateRefinementMode);
+            }
         }
 
-
-        this.evaluateFeasibility(population);
 
         // Sort last population
         Collections.sort(population);
@@ -153,28 +161,16 @@ public class Algorithm {
         Individual bestIndividual = population.get(0);
         System.out.println("Result is feasible " + bestIndividual.isFeasible());
         System.out.println(bestIndividual);
-        this.printRouteDemands(bestIndividual);
+
         List<CrowdedDepot> solutionDepots = this.manager.assignCustomerToDepotsFromIndividual(bestIndividual);
-        int aa = 0;
+
         for (CrowdedDepot depot: solutionDepots) {
             System.out.println(depot.getCustomerIds());
-            aa += depot.getCustomers().size();
         }
 
-        System.out.println("Number of customers in solution: " + aa);
         return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
 
-
-    private void printCustomerInfo(Customer customer, int customerId) {
-        System.out.println("\nCustomer example: Customer " + customerId);
-        System.out.println("------------------------");
-        System.out.println("Id:                 " + customer.getId());
-        System.out.println("X coordinate:       " + customer.getX());
-        System.out.println("Y coordinate:       " + customer.getY());
-        System.out.println("Duration:           " + customer.getDuration());
-        System.out.println("Demand:             " + customer.getDemand());
-    }
 
     private void printBorderCustomers() {
         List<Integer> borderLineCustomerIds = new ArrayList<>();
@@ -185,6 +181,7 @@ public class Algorithm {
         System.out.println("\nCustomers on borderline:");
         System.out.println(borderLineCustomerIdsString);
     }
+
 
     private double evaluatePopulation(List<Individual> population) {
         double totalDistanceForPop = 0;
@@ -201,30 +198,11 @@ public class Algorithm {
         return totalDistanceForPop / population.size();
     }
 
+
     private void evaluateFeasibility(List<Individual> population) {
         for (Individual individual : population) {
             boolean isFeasible = this.metrics.isIndividualFeasible(individual);
             individual.setIsFeasible(isFeasible);
         }
     }
-
-    private void printRouteDemands(Individual individual) {
-        System.out.println("Route demands");
-        for (Map.Entry<Integer, List<List<Integer>>> entry : individual.getChromosome().entrySet()) {
-            int key = entry.getKey();
-            System.out.println("Depot " + key);
-            List<List<Integer>> chromosomeDepot = entry.getValue();
-            int routeIndex = 1;
-            for (List<Integer> route: chromosomeDepot) {
-                int demand = 0;
-                for (int customerID : route) {
-                    Customer c = this.manager.getCustomer(customerID);
-                    demand += c.getDemand();
-                }
-                System.out.println("Route " + routeIndex + ": " + demand);
-                routeIndex++;
-            }
-        }
-    }
-
 }

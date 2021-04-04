@@ -8,11 +8,19 @@ import java.lang.Math;
 import java.util.stream.Collectors;
 
 import GA.Components.Individual;
+import GA.Components.Route;
 import GA.Operations.Selection;
 import Utils.Euclidian;
 import Utils.Formatter;
 
-
+/*
+Class managing problem instance
+- Read problem from file
+- Initialize problem instances (customers and depots)
+- Assign customers to closest depot as an initial assignment (creates crowded depots)
+- Assign customers to correct depot according the chromosome of an individual (creates crowded depots)
+- Write solution to file
+ */
 public class Manager {
     private List<Customer> customers = new ArrayList<>();
     private List<Customer> swappableCustomers = new ArrayList<>();
@@ -22,8 +30,7 @@ public class Manager {
 
     public Manager(String problemFilepath, double borderlineThreshold) {
         this.borderlineThreshold = borderlineThreshold;
-        // read data and initialize customers and depots
-        this.readData(problemFilepath);
+        this.readData(problemFilepath);                             // read data and initialize customers and depots
     }
 
 
@@ -148,6 +155,7 @@ public class Manager {
             for (Map.Entry<Integer, Double> entry : depotDistances.entrySet()) {
                 if ((entry.getValue() - shortestDistance) / shortestDistance < this.borderlineThreshold && entry.getKey() != currentShortestDepot.getId()) {
                     customer.addPossibleDepot(entry.getKey());
+                    customer.setOnBorderline();
                     isBorderlineCustomer = true;
                 }
             }
@@ -164,20 +172,22 @@ public class Manager {
     public List<CrowdedDepot> assignCustomerToDepotsFromIndividual(Individual individual) {
         List<CrowdedDepot> depots = this.copyDepots().stream().map(CrowdedDepot::new).collect(Collectors.toList());
         for (CrowdedDepot depot : depots) {
-            List<List<Integer>> routes = individual.getChromosome().get(depot.getId());
-            for (List<Integer> route : routes) {
-                for (Integer customerId : route) {
+            List<Route> routes = individual.getChromosome().get(depot.getId());
+            for (Route route : routes) {
+                for (Integer customerId : route.getRoute()) {
                     Customer customer = this.getCustomer(customerId);
                     depot.addCustomer(customer);
                 }
             }
         }
-
         return depots;
     }
 
 
     public static void saveSolution(Solution solution, String outputPath) {
+        /*
+        Writes solution to file
+         */
         File file;
         FileWriter filewriter = null;
 
@@ -187,23 +197,26 @@ public class Manager {
             filewriter = new FileWriter(file);
 
             // Write total solution cost (distance)
-            filewriter.write("" + solution.getIndividual().getFitness());
+            double distance = solution.getIndividual().getFitness();
+            filewriter.write("" + String.format(Locale.ROOT, "%.2f", distance));
 
-            for (Map.Entry<Integer, List<List<Integer>>> entry : solution.getIndividual().getChromosome().entrySet()) {
+            for (Map.Entry<Integer, List<Route>> entry : solution.getIndividual().getChromosome().entrySet()) {
                 int depotID = entry.getKey();
-                List<Double> routesDemand = solution.getRoutesDemand().get(depotID);
+                List<Integer> routesDemand = solution.getRoutesDemand().get(depotID);
                 List<Double> routesDistance = solution.getRoutesDistance().get(depotID);
 
-                List<List<Integer>> depotRoutes = entry.getValue();
+                List<Route> depotRoutes = entry.getValue();
 
                 for (int i = 0; i < depotRoutes.size(); i++) {
-                    List<Integer> route = depotRoutes.get(i);
-                    double routeDemand = routesDemand.get(i);
+                    Route route = depotRoutes.get(i);
+                    int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
+                    //double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
+                    // System.out.println(routeDistance == rr);
                     int vehicleID = i + 1;
 
                     // Write output line to file
-                    filewriter.write("\n" + Formatter.formatOutputLine(depotID, vehicleID, routeDistance, routeDemand, route));
+                    filewriter.write("\n" + Formatter.formatOutputLine(depotID, vehicleID, routeDistance, routeDemand, route.getRoute()));
                 }
             }
 
@@ -223,7 +236,5 @@ public class Manager {
             }
         }
     }
-
-
 
 }
