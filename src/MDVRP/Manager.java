@@ -1,17 +1,25 @@
 package MDVRP;
 
+import GA.Components.Individual;
+import GA.Components.Route;
+import Utils.Euclidian;
+import Utils.Formatter;
+
+import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.lang.Math;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import GA.Components.Individual;
-import GA.Components.Route;
-import GA.Operations.Selection;
-import Utils.Euclidian;
-import Utils.Formatter;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.WritableImage;
+
+import javax.imageio.ImageIO;
+
 
 /*
 Class managing problem instance
@@ -211,7 +219,7 @@ public class Manager {
                     Route route = depotRoutes.get(i);
                     int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
-                    //double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
+                    // double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
                     // System.out.println(routeDistance == rr);
                     int vehicleID = i + 1;
 
@@ -234,6 +242,19 @@ public class Manager {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+
+    public static void saveSolutionImage(Canvas canvas, int height, int width, String outputPath) {
+        WritableImage wim = new WritableImage(width, height);
+        canvas.snapshot(null, wim);
+
+        File file = new File(outputPath);
+        try {
+            ImageIO.write(SwingFXUtils.fromFXImage(wim, null), "png", file);
+        } catch (Exception s) {
+            System.out.println(s);
         }
     }
 

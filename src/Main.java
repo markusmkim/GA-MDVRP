@@ -1,26 +1,23 @@
 import GA.Algorithm;
-import GA.Components.Individual;
-import GA.Components.Route;
 import MDVRP.*;
+import Utils.Visualizer;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.util.List;
-import java.util.Random;
 
 
 public class Main extends Application {
-    private double scalingFactor;
 
     @Override
     public void start(Stage stage) {
-        String problem = "p08";
+        /*
+        String problem = "p01";
 
         Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
 
@@ -37,134 +34,58 @@ public class Main extends Application {
         // Save solution to file
         Manager.saveSolution(solution, "data/solutions/" + problem + ".res");
 
-        // Prepare data for plotting
-        this.scaleTransform(depots);
-
-        // Show result
-        Canvas canvas = new Canvas(500, 500);                 // Create the Canvas
+        int height = 500;
+        int width = 500;
+        Canvas canvas = new Canvas(width, height);                          // Create the Canvas
         GraphicsContext gc = canvas.getGraphicsContext2D();                 // Get the graphics context of the canvas
 
-        this.drawSolution(gc, depots, solution.getIndividual());            // Draw solution
+        Visualizer visualizer = new Visualizer(gc);
+        visualizer.plotSolution(depots, solution.getIndividual());          // Plot solution
 
+        // Show result
         Pane root = new Pane();                                             // Create the Pane
         root.getChildren().add(canvas);                                     // Add the Canvas to the Pane
         Scene scene = new Scene(root);                                      // Create the Scene
         stage.setScene(scene);                                              // Add the Scene to the Stage
         stage.setTitle("Solution");                                         // Set the Title of the Stage
         stage.show();                                                       // Display the Stage
-    }
 
+        // Save graphical solution to file
+        Manager.saveSolutionImage(canvas, height, width, "data/solutionImages/" + problem + ".png");
+         */
 
-    private void drawSolution(GraphicsContext gc, List<CrowdedDepot> depots, Individual individual) {
-        for (CrowdedDepot depot: depots) {
-            this.drawCustomers(gc, depot);
-            gc.setLineWidth(1.2);
-            this.drawRoutes(gc, depot, individual);
-        }
-    }
+        for (int i = 1; i <= 23; i++) {
+            String problem = i < 10 ? "p0" + i : "p" + i;
 
+            Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
 
-    private void drawCustomers(GraphicsContext gc, CrowdedDepot depot) {
-        // draw depot
-        gc.setFill(Color.BLACK);
-        double depotSize = 10;
-        double x = (depot.getX() * this.scalingFactor) - (depotSize / 2);
-        double y = (depot.getY() * this.scalingFactor) - (depotSize / 2);
-        gc.fillRect(x, y, depotSize, depotSize);
+            Algorithm ga = new Algorithm(manager);
 
-        // draw all customers belonging to depots
-        for (Customer customer: depot.getCustomers()) {
-            double size = 6;
-            // if (customer.getOnBorder()) { size = 10; }
-            double xx = (customer.getX() * this.scalingFactor) - (size / 2);
-            double yy = (customer.getY() * this.scalingFactor) - (size / 2);
-            gc.fillOval(xx, yy, size, size);
-        }
-    }
+            // Run algorithm
+            Solution solution = ga.run();
 
+            List<CrowdedDepot> depots = solution.getDepots();
 
-    private void drawRoutes(GraphicsContext gc, CrowdedDepot depot, Individual individual) {
-        // Possible colors for a route
-        Color[] colors = new Color[]{
-                Color.CADETBLUE,
-                Color.CORAL,
-                Color.DARKSLATEBLUE,
-                Color.CYAN,
-                Color.DARKGOLDENROD,
-                Color.DARKMAGENTA,
-                Color.BLUEVIOLET,
-                Color.CRIMSON,
-                Color.DEEPPINK,
-                Color.DARKORANGE,
-        };
+            double solutionCost = solution.getIndividual().getFitness();
+            System.out.println("\nTotal distance best solution: " + solutionCost);
 
-        Random random = new Random();
+            // Save solution to file
+            Manager.saveSolution(solution, "data/solutions/" + problem + ".res");
 
-        int colorIndex = random.nextInt(10);
+            int height = 500;
+            int width = 500;
+            Canvas canvas = new Canvas(width, height);                          // Create the Canvas
+            GraphicsContext gc = canvas.getGraphicsContext2D();                 // Get the graphics context of the canvas
 
-        List<Route> routes = individual.getChromosome().get(depot.getId());
+            Visualizer visualizer = new Visualizer(gc);
+            visualizer.plotSolution(depots, solution.getIndividual());          // Plot solution
 
-        for (Route route : routes) {
-            double[] xPoints = new double[route.getRoute().size() + 1];
-            double[] yPoints = new double[route.getRoute().size() + 1];
-
-            xPoints[0] = depot.getX() * this.scalingFactor;
-            yPoints[0] = depot.getY() * this.scalingFactor;
-
-            for (int i = 0; i < route.getRoute().size(); i++) {
-                Customer customer = depot.getCustomer(route.getRoute().get(i));
-                xPoints[i + 1] = customer.getX() * this.scalingFactor;
-                yPoints[i + 1] = customer.getY() * this.scalingFactor;
-            }
-
-            gc.setStroke(colors[colorIndex]);
-            gc.strokePolygon(xPoints, yPoints, xPoints.length);
-            colorIndex = (colorIndex + 1) % 10;
-        }
-    }
-
-
-    private void scaleTransform(List<CrowdedDepot> depots) {
-        int maxX = 0;
-        int maxY = 0;
-        int minX = 0;
-        int minY = 0;
-        for (CrowdedDepot depot : depots) {
-            for (Customer customer : depot.getCustomers()) {
-                if (customer.getX() > maxX) { maxX = customer.getX(); }
-                if (customer.getY() > maxY) { maxY = customer.getY(); }
-                if (customer.getX() < minX) { minX = customer.getX(); }
-                if (customer.getY() < minY) { minY = customer.getY(); }
-            }
+            // Save graphical solution to file
+            Manager.saveSolutionImage(canvas, height, width, "data/solutionImages/" + problem + ".png");
         }
 
-        // Compute appropriate scaling factor
-        int diffX = maxX - minX;
-        int diffY = maxY - minY;
-        double size = Integer.max(diffX, diffY);
-
-        this.scalingFactor = 470 / size;
-
-        // Transform all coordinates to positive axes
-        if (minX < 0 || minY < 0) {
-            for (CrowdedDepot depot : depots) {
-                if (minX < 0) {
-                    depot.setX(depot.getX() - minX + 10);
-                }
-                if (minX < 0) {
-                    depot.setY(depot.getY() - minY + 10);
-                }
-                for (Customer customer : depot.getCustomers()) {
-                    if (minX < 0) {
-                        customer.setX(customer.getX() - minX + 10);
-                    }
-                    if (minX < 0) {
-                        customer.setY(customer.getY() - minY + 10);
-                    }
-                }
-            }
-        }
     }
+
 
 
     public static void main(String[] args) {

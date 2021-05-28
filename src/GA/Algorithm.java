@@ -5,7 +5,6 @@ import GA.Operations.*;
 import MDVRP.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class Algorithm {
@@ -25,9 +24,9 @@ public class Algorithm {
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
         int populationSize = 100; // 80 - 100
-        int numberOfGenerations = 1200;
-        double fitnessGoal = 5060;
-        int refinementAfter = 600; //600 - 800
+        int numberOfGenerations = 1000; // 1200
+        double fitnessGoal = 0;
+        int refinementAfter = 700; //600 - 800
         double fitnessBias = 0.8;
         double crossoverRate = 0.8; // 0.6 - 0.8
         double crossoverRateRefinementMode = 0.4;
@@ -53,6 +52,11 @@ public class Algorithm {
 
 
     public Solution run() {
+        return this.run(new ArrayList<>());
+    }
+
+
+    public Solution run(List<Double> historyShortestDistance) {
         List<Customer> customers = this.manager.getCustomers();
         List<CrowdedDepot> crowdedDepots = this.manager.assignCustomersToDepots();
 
@@ -80,6 +84,7 @@ public class Algorithm {
 
         // ---------------------------------------------------------------------------- //
         Collections.sort(population);
+        historyShortestDistance.add(population.get(0).getFitness());
         List<Individual> bestParents = new ArrayList<>();
         for (int i = 0; i < this.eliteReplacement; i++) {
             bestParents.add(population.get(i).getClone());
@@ -121,6 +126,10 @@ public class Algorithm {
             population = population.subList(0, population.size() - this.eliteReplacement);
             population.addAll(bestParents);
             Collections.sort(population);
+
+            if (generation % 10 == 0) {
+                historyShortestDistance.add(population.get(0).getFitness());
+            }
 
             if (generation % 100 == 0) {
                 System.out.println("Generation: " + generation +
@@ -170,18 +179,6 @@ public class Algorithm {
 
         return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
-
-
-    private void printBorderCustomers() {
-        List<Integer> borderLineCustomerIds = new ArrayList<>();
-        for (Customer customer: this.manager.getSwappableCustomers()) {
-            borderLineCustomerIds.add(customer.getId());
-        }
-        String borderLineCustomerIdsString = Arrays.toString(borderLineCustomerIds.toArray());
-        System.out.println("\nCustomers on borderline:");
-        System.out.println(borderLineCustomerIdsString);
-    }
-
 
     private double evaluatePopulation(List<Individual> population) {
         double totalDistanceForPop = 0;
