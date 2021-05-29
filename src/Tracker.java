@@ -19,12 +19,10 @@ public class Tracker extends Application {
     public void start(Stage stage) {
         String problem = "p06";
 
-        Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
-
-        Algorithm ga = new Algorithm(manager);
-
         List<List<Double>> histories = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
+            Manager manager = new Manager("data/problems/" + problem, 0.5);
+            Algorithm ga = new Algorithm(manager);
             List<Double> history = new ArrayList<>();
             histories.add(history);
             ga.run(history);                                                // Run algorithm

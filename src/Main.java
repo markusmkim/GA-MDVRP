@@ -16,7 +16,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        /*
         String problem = "p01";
 
         Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
@@ -52,38 +51,6 @@ public class Main extends Application {
 
         // Save graphical solution to file
         Manager.saveSolutionImage(canvas, height, width, "data/solutionImages/" + problem + ".png");
-         */
-
-        for (int i = 1; i <= 23; i++) {
-            String problem = i < 10 ? "p0" + i : "p" + i;
-
-            Manager manager = new Manager("data/problems/" + problem, 0.5); // 0.46
-
-            Algorithm ga = new Algorithm(manager);
-
-            // Run algorithm
-            Solution solution = ga.run();
-
-            List<CrowdedDepot> depots = solution.getDepots();
-
-            double solutionCost = solution.getIndividual().getFitness();
-            System.out.println("\nTotal distance best solution: " + solutionCost);
-
-            // Save solution to file
-            Manager.saveSolution(solution, "data/solutions/" + problem + ".res");
-
-            int height = 500;
-            int width = 500;
-            Canvas canvas = new Canvas(width, height);                          // Create the Canvas
-            GraphicsContext gc = canvas.getGraphicsContext2D();                 // Get the graphics context of the canvas
-
-            Visualizer visualizer = new Visualizer(gc);
-            visualizer.plotSolution(depots, solution.getIndividual());          // Plot solution
-
-            // Save graphical solution to file
-            Manager.saveSolutionImage(canvas, height, width, "data/solutionImages/" + problem + ".png");
-        }
-
     }
 
 
