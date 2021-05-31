@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 /*
-Class to measure the individuals in terms of the problem domain
+Class to evaluate the population
  */
 public class Metrics {
     private Manager manager;
@@ -92,7 +92,6 @@ public class Metrics {
         Customer toCustomer = this.manager.getCustomer(route.get(0));
         int[] toCustomerCoordinates = new int[]{toCustomer.getX(), toCustomer.getY()};
         totalDistance += Euclidian.distance(depotCoordinates, toCustomerCoordinates);
-
 
         // Add distances between customers
         Customer fromCustomer = toCustomer;
@@ -174,29 +173,3 @@ public class Metrics {
     }
 }
 
-
-
-/*
-// OLD FITNESS FUNCTION
-    public double getTotalDistanceOLD(Individual individual) {
-        List<Depot> depots = this.manager.getDepots();
-        double totalDistance = 0;
-        for (Map.Entry<Integer, List<Route>> entry : individual.getChromosome().entrySet()) {
-            int key = entry.getKey();
-            List<Route> chromosomeDepot = entry.getValue();
-            for (Route route : chromosomeDepot) {
-                Depot depot = depots.stream().filter(d -> key == d.getId()).findAny().orElse(null);// find depot
-                if (depot == null) {
-                    System.out.println("Something wring, depot = null in Metrics.getTotalDistance");
-                    depot = depots.get(0);
-                }
-                totalDistance += this.getRouteDistance(depot.getId(), route.getRoute());                                 // get distance
-
-                // Print route demand
-                // double routeDemand = this.getRouteDemand(route);
-                //System.out.println("Route demand:  " + routeDemand);
-            }
-        }
-        return totalDistance;
-    }
- */

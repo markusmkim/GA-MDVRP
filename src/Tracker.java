@@ -7,7 +7,9 @@ import java.util.List;
 
 
 public class Tracker {
-
+    /*
+    Runs through algorithm multiple times and tracks statistics
+     */
     public static void main(String[] args) {
         String problem = "p10";
 
@@ -17,10 +19,10 @@ public class Tracker {
             Algorithm ga = new Algorithm(manager);
             List<Double> history = new ArrayList<>();
             histories.add(history);
-            ga.run(history);                                                // Run algorithm
+            ga.run(history);                                                            // Run algorithm
         }
 
-        List<Double> averagedHistories = Stats.averageHistories(histories);
+        List<Double> averagedHistories = Stats.averageHistories(histories);             // Find Mean Best Fitness
 
         Manager.saveProgression(averagedHistories, "data/progression/" + problem + ".csv");
     }

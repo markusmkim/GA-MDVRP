@@ -31,13 +31,13 @@ public class RouteScheduler {
                 currentAggregatedVehicleLoad += customer.getDemand();
             }
             else {
-                routes.add(new Route(route, currentAggregatedVehicleLoad, metrics.getRouteDistance(depot.getId(), route)));          // Add current route to router
-                route = new ArrayList<>();  // Reset current route values
+                routes.add(new Route(route, currentAggregatedVehicleLoad, metrics.getRouteDistance(depot.getId(), route)));     // Add current route to router
+                route = new ArrayList<>();                                                                                      // Reset current route values
                 route.add(customer.getId());
                 currentAggregatedVehicleLoad = customer.getDemand();
             }
         }
-        if (route.size() > 0) {  // Add last route
+        if (route.size() > 0) {                                                                                                 // Add last route
             routes.add(new Route(route, currentAggregatedVehicleLoad, metrics.getRouteDistance(depot.getId(), route)));
         }
 

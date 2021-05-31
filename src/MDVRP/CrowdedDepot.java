@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
-A depot with assigned customers
+A depot assigned to customers
  */
 public class CrowdedDepot extends Depot {
     private List<Customer> customers = new ArrayList<>();

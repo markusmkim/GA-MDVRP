@@ -9,7 +9,7 @@ In this case fitness = total distance travelled and should be minimized.
  */
 public class Individual implements Comparable<Individual> {
     private double fitness;
-    private Map<Integer, List<Route>> chromosome;  // Map<DepotID, DepotRoutes>
+    private final Map<Integer, List<Route>> chromosome;  // Map<DepotID, DepotRoutes>
     private boolean isFeasible;
 
 
@@ -25,7 +25,7 @@ public class Individual implements Comparable<Individual> {
     public void setIsFeasible(boolean feasible) { this.isFeasible = feasible; }
     public void setFitness(double fitness) {
         if (fitness < 0) {
-            System.out.println("Something wrong - negative fitness in Individual.setFitness");
+            System.out.println("Error: Distance cannot be negative (negative fitness in: Individual.setFitness)");
             return;
         }
         this.fitness = fitness;

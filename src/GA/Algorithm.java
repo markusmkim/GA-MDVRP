@@ -70,8 +70,6 @@ public class Algorithm {
             System.out.println("Depot " + depot.getId() + " has " + depot.getCustomers().size() + " customers");
         }
 
-        // this.printBorderCustomers();
-
         // Initialize population
         List<Individual> population = Initializer.init(this.populationSize, crowdedDepots, this.metrics);
         System.out.println("\nInitial population size: " + population.size());
@@ -82,7 +80,7 @@ public class Algorithm {
         this.evaluateFeasibility(population);
         System.out.println("Generation: 0  |  Population size: " + population.size() + "  | Average total distance: " + averageDistance);
 
-        // ---------------------------------------------------------------------------- //
+
         Collections.sort(population);
         historyShortestDistance.add(population.get(0).getFitness());
         List<Individual> bestParents = new ArrayList<>();
@@ -91,6 +89,7 @@ public class Algorithm {
         }
         this.evaluatePopulation(bestParents);
         this.evaluateFeasibility(bestParents);
+
         // For each generation
         for (int generation = 1; generation <= this.numberOfGenerations; generation++) {
             List<Individual> offspring = new ArrayList<>();
@@ -179,6 +178,7 @@ public class Algorithm {
 
         return new Solution(solutionDepots, bestIndividual, this.metrics);
     }
+
 
     private double evaluatePopulation(List<Individual> population) {
         double totalDistanceForPop = 0;

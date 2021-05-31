@@ -5,7 +5,6 @@ import GA.Components.Route;
 import Utils.Euclidian;
 import Utils.Formatter;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
@@ -13,7 +12,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
@@ -22,12 +20,12 @@ import javax.imageio.ImageIO;
 
 
 /*
-Class managing problem instance
+Class managing problem instance:
 - Read problem from file
 - Initialize problem instances (customers and depots)
 - Assign customers to closest depot as an initial assignment (creates crowded depots)
 - Assign customers to correct depot according the chromosome of an individual (creates crowded depots)
-- Write solution to file
+- Save solution to file in several formats
  */
 public class Manager {
     private List<Customer> customers = new ArrayList<>();
@@ -110,7 +108,7 @@ public class Manager {
             while (fileReader.hasNextLine() && lineCounter < nDepots) {
                 String line = fileReader.nextLine().trim();
                 String[] lineArrSplit = line.split("\\s+");
-                //////System.out.println(Arrays.toString(lineArrSplit));
+
                 int x = Integer.parseInt(lineArrSplit[1]);
                 int y = Integer.parseInt(lineArrSplit[2]);
                 int maxDuration = maxRouteDurationsPerDepot.get(lineCounter);
@@ -218,8 +216,6 @@ public class Manager {
                     Route route = depotRoutes.get(i);
                     int routeDemand = routesDemand.get(i);
                     double routeDistance = routesDistance.get(i);
-                    // double rr = solution.getIndividual().getChromosome().get(depotID).get(i).getDistance();
-                    // System.out.println(routeDistance == rr);
                     int vehicleID = i + 1;
 
                     // Write output line to file
@@ -270,10 +266,9 @@ public class Manager {
             filewriter.write("" + generation + "," + values.get(0));
 
             for (double value : values.subList(1, values.size())) {
-                generation += 5;
+                generation += 10;
                 filewriter.write("\n" + generation + "," + value);
             }
-
 
             filewriter.close();  // Close stream
             System.out.println("Progression saved");
@@ -291,5 +286,4 @@ public class Manager {
             }
         }
     }
-
 }

@@ -7,7 +7,7 @@ import java.util.List;
 Represents a route from and to a particular depot.
  */
 public class Route {
-    private List<Integer> route;    // List of customer IDs
+    private final List<Integer> route;    // List of customer IDs
     private int demand;             // total demand of customers
     private double distance;        // total route distance
 

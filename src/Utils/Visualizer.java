@@ -9,7 +9,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class Visualizer {
@@ -135,45 +134,4 @@ public class Visualizer {
             }
         }
     }
-
-
-    public void plotMeanProgression(List<Double> averagedHistories) {
-        if (averagedHistories.isEmpty()) {
-            return;
-        }
-
-        System.out.println(averagedHistories);
-
-        double max = 460;
-        double maxDistance = averagedHistories.get(0);
-        double scale = max / maxDistance;
-        List<Double> averagedScaledHistories = averagedHistories.stream().map(e -> e * scale).collect(Collectors.toList());
-
-
-
-        // Coordinate system
-        this.gc.setLineWidth(1.8);
-        this.gc.setStroke(Color.BLACK);
-        gc.beginPath();
-        gc.moveTo(40, 40);
-        gc.lineTo(40, 460);
-        gc.lineTo(660, 460);
-        gc.stroke();
-
-        // Values
-        gc.beginPath();
-        this.gc.setLineWidth(2.2);
-        this.gc.setStroke(Color.CORAL);
-        double xValue = 60.0;
-        double firstValue = averagedScaledHistories.get(0);
-        gc.moveTo(xValue, 500 - firstValue);
-        for (double value : averagedScaledHistories.subList(1, averagedScaledHistories.size())) {
-            gc.lineTo(xValue, 500 - value);
-            xValue += 5;
-        }
-        gc.stroke();
-    }
-
-
-
 }
