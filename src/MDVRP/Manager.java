@@ -201,7 +201,6 @@ public class Manager {
 
         try {
             file = new File(outputPath);
-
             filewriter = new FileWriter(file);
 
             // Write total solution cost (distance)
@@ -255,6 +254,41 @@ public class Manager {
             ImageIO.write(SwingFXUtils.fromFXImage(wim, null), "png", file);
         } catch (Exception s) {
             System.out.println(s);
+        }
+    }
+
+
+    public static void saveProgression(List<Double> values, String outputPath) {
+        File file;
+        FileWriter filewriter = null;
+
+        try {
+            file = new File(outputPath);
+            filewriter = new FileWriter(file);
+
+            int generation = 0;
+            filewriter.write("" + generation + "," + values.get(0));
+
+            for (double value : values.subList(1, values.size())) {
+                generation += 5;
+                filewriter.write("\n" + generation + "," + value);
+            }
+
+
+            filewriter.close();  // Close stream
+            System.out.println("Progression saved");
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (filewriter != null) {
+                    filewriter.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
