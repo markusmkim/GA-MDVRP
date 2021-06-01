@@ -254,6 +254,37 @@ public class Manager {
     }
 
 
+    public static void saveAverageResults(double[] averagedResults, String outputPath) {
+        File file;
+        FileWriter filewriter = null;
+
+        try {
+            file = new File(outputPath);
+            filewriter = new FileWriter(file);
+
+            for (int i = 1; i <= 23; i++) {
+                String problem = i < 10 ? "p0" + 1 : "p" + i;
+                filewriter.write("" + problem + "," + averagedResults[i - 1] + "\n");
+            }
+
+            filewriter.close();  // Close stream
+            System.out.println("Averaged results saved");
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (filewriter != null) {
+                    filewriter.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     public static void saveProgression(List<Double> values, String outputPath) {
         File file;
         FileWriter filewriter = null;
