@@ -9,22 +9,47 @@ The rules of an MDVRP can be formulated as follows:
 - Several vehicles are assigned to each depot. A vehicle must start from and return to the same depot.
 - Each vehicle has a limited service capacity *Q*. That is, for a given vehicle the total customer demand on its route cannot exceed Q.
 - For some problems there is also a maximum duration *R* for each single route.
-- The objective is to maximize or minimize some goal. **Here, the objective is to minimize the total distance travelled by all vehicles
+- The objective is to maximize or minimize some goal. Here, **the objective is to minimize the total distance travelled by all vehicles
   across the depots to serve all customers**
   
 
 ## Results
-Problem | p01 | p08 | p10
+Instance | p01 | p08 | p10
 :-: | :-: | :-: | :-:
 Solution | ![p01](/data/solutionImages/p01.png) | ![p02](/data/solutionImages/p08.png) | ![p03](/data/solutionImages/p10.png)
 **Distance** | **597.66** | **4692.56** | **3973.76**
 Depots | 4 | 2 | 4
 Customers | 50 | 249 | 249
-*Q* ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=hei) `#f03c15` | 80 | 500 | 500
+*Q* | 80 | 500 | 500
 *R* | - | 310 | 310
 
 
-Problem 
+Instance | Customers | Depots | *Q* | *R* | BKB | GA-best | GA-avg | Loss | Deviation
+:-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-:
+p01 | x | y | z | a | b | c | d | e | f
+p02 | x | y | z | a | b | c | d | e | f
+p03 | x | y | z | a | b | c | d | e | f
+p04 | x | y | z | a | b | c | d | e | f
+p05 | x | y | z | a | b | c | d | e | f
+p06 | x | y | z | a | b | c | d | e | f
+p07 | x | y | z | a | b | c | d | e | f
+p08 | x | y | z | a | b | c | d | e | f
+p09 | x | y | z | a | b | c | d | e | f
+p10 | x | y | z | a | b | c | d | e | f
+p11 | x | y | z | a | b | c | d | e | f
+p12 | x | y | z | a | b | c | d | e | f
+p13 | x | y | z | a | b | c | d | e | f
+p14 | x | y | z | a | b | c | d | e | f
+p15 | x | y | z | a | b | c | d | e | f
+p16 | x | y | z | a | b | c | d | e | f
+p17 | x | y | z | a | b | c | d | e | f
+p18 | x | y | z | a | b | c | d | e | f
+p19 | x | y | z | a | b | c | d | e | f
+p20 | x | y | z | a | b | c | d | e | f
+p21 | x | y | z | a | b | c | d | e | f
+p22 | x | y | z | a | b | c | d | e | f
+p23 | x | y | z | a | b | c | d | e | f
+
 
 ## References
 [1]  B. Ombuki-Berman and F. T. Hanshar. “Using Genetic Algorithms for Multi-depot
