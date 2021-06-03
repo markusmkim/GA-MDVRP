@@ -263,7 +263,7 @@ public class Manager {
             filewriter = new FileWriter(file);
 
             for (int i = 1; i <= 23; i++) {
-                String problem = i < 10 ? "p0" + 1 : "p" + i;
+                String problem = i < 10 ? "p0" + i : "p" + i;
                 filewriter.write("" + problem + "," + averagedResults[i - 1] + "\n");
             }
 

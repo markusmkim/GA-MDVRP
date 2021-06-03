@@ -23,8 +23,8 @@ public class Algorithm {
 
     public Algorithm(Manager manager) {
         // ------------------- PARAMS -------------------- //
-        int populationSize = 10; // 80 - 100
-        int numberOfGenerations = 100; // 1200
+        int populationSize = 100; // 80 - 100
+        int numberOfGenerations = 1200; // 1200
         double fitnessGoal = 0;
         int refinementAfter = 700; //600 - 800
         double fitnessBias = 0.8;
@@ -32,7 +32,7 @@ public class Algorithm {
         double crossoverRateRefinementMode = 0.4;
         double crossoverFeasibleBalance = 1;
         double mutationRate = 0.05;
-        int eliteReplacement = 2; // 20
+        int eliteReplacement = 20;
         int interDepotMutationFreq = 10;
         // ------------------------------------------------//
 

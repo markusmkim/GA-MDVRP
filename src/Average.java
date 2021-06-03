@@ -11,7 +11,7 @@ public class Average {
      */
     public static void main(String[] args) {
         double[] distanceVector = new double[23];
-        int rounds = 2;
+        int rounds = 10;
 
         for (int round = 0; round < rounds; round++) {
             for (int i = 1; i <= 23; i++) {
