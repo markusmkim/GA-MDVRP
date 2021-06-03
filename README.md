@@ -26,29 +26,29 @@ Customers | 50 | 249 | 249
 
 Instance | Customers | Depots | *Q* | *R* | BKB | GA-best | GA-avg | Loss | Deviation
 :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-:
-p01 | x | y | z | a | b | c | d | e | f
-p02 | x | y | z | a | b | c | d | e | f
-p03 | x | y | z | a | b | c | d | e | f
-p04 | x | y | z | a | b | c | d | e | f
-p05 | x | y | z | a | b | c | d | e | f
-p06 | x | y | z | a | b | c | d | e | f
-p07 | x | y | z | a | b | c | d | e | f
-p08 | x | y | z | a | b | c | d | e | f
-p09 | x | y | z | a | b | c | d | e | f
-p10 | x | y | z | a | b | c | d | e | f
-p11 | x | y | z | a | b | c | d | e | f
-p12 | x | y | z | a | b | c | d | e | f
-p13 | x | y | z | a | b | c | d | e | f
-p14 | x | y | z | a | b | c | d | e | f
-p15 | x | y | z | a | b | c | d | e | f
-p16 | x | y | z | a | b | c | d | e | f
-p17 | x | y | z | a | b | c | d | e | f
-p18 | x | y | z | a | b | c | d | e | f
-p19 | x | y | z | a | b | c | d | e | f
-p20 | x | y | z | a | b | c | d | e | f
-p21 | x | y | z | a | b | c | d | e | f
-p22 | x | y | z | a | b | c | d | e | f
-p23 | x | y | z | a | b | c | d | e | f
+p01 | x | y | z | a | b | c | 597.78 | e | f
+p02 | x | y | z | a | b | c | 493.62 | e | f
+p03 | x | y | z | a | b | c | 670.77 | e | f
+p04 | x | y | z | a | b | c | 1087.58 | e | f
+p05 | x | y | z | a | b | c | 776.97 | e | f
+p06 | x | y | z | a | b | c | 918.91 | e | f
+p07 | x | y | z | a | b | c | 935.55 | e | f
+p08 | x | y | z | a | b | c | 4751.61 | e | f
+p09 | x | y | z | a | b | c | 4139.20 | e | f
+p10 | x | y | z | a | b | c | 3943.01 | e | f
+p11 | x | y | z | a | b | c | 3948.86 | e | f
+p12 | x | y | z | a | b | c | 1324.58 | e | f
+p13 | x | y | z | a | b | c | 1325.40 | e | f
+p14 | x | y | z | a | b | c | 1365.69 | e | f
+p15 | x | y | z | a | b | c | 2630.59 | e | f
+p16 | x | y | z | a | b | c | 2638.80 | e | f
+p17 | x | y | z | a | b | c | 2731.37 | e | f
+p18 | x | y | z | a | b | c | 4036.07 | e | f
+p19 | x | y | z | a | b | c | 3973.95 | e | f
+p20 | x | y | z | a | b | c | 4097.06 | e | f
+p21 | x | y | z | a | b | c | 6243.98 | e | f
+p22 | x | y | z | a | b | c | 6055.04 | e | f
+p23 | x | y | z | a | b | c | 6160.56 | e | f
 
 
 ## References
