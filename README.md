@@ -25,7 +25,7 @@ Customers | 50 | 249 | 249
 
 
 Instance | Customers | Depots | *Q* | *R* | BKB | GA-best | GA-avg | Loss | Deviation
-:-: | :-: | :-: | :-: | :-: | :-: | :-: | --- | :-: | :-:
+:-: | :-: | :-: | :-: | :-: | :-: | :-: | --: | :-: | :-:
 p01 | x | y | z | a | b | c | 597.78 | e | f
 p02 | x | y | z | a | b | c | 493.62 | e | f
 p03 | x | y | z | a | b | c | 670.77 | e | f
