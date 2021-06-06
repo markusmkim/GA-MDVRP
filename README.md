@@ -40,7 +40,7 @@ The error column shows the relative difference between BKB and GA-best (with BKB
 difference between GA-avg with GA-best (with GA-avg as the reference point).
 
 Instance | Customers | Depots | *Q* | *R* | BKB | GA-best | GA-avg | Error % | Deviation %
-:-: | :-: | :-: | :-: | :-: | --: | --: | --: | :-: | :-:
+:-: | :-: | :-: | :-: | :-: | --: | --: | --: | --: | --:
 p01 | 50 | 4 | 80 | - | 576.87 | 597.66 | 597.78 | 3.6 | 0.02
 p02 | 50 | 4 | 160 | - | 473.53 | 490.50 | 493.62 | 3.58 | 0.63
 p03 | 75 | 5 | 140 | - | 641.19 | 669.67 | 670.77 | 4.44 | 0.16
